@@ -1,0 +1,5 @@
+import ComplexMaker!
+
+const const Maker = new ComplexMaker()!
+
+print "test"!
