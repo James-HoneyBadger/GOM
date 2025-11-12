@@ -20,4 +20,4 @@ Usage:
 
 Examples are included in the examples/ directory.
 
-For more information, visit: https://github.com/vivaansinghvi07/dreamberd-interpreter
+For more information, visit: https://github.com/James-HoneyBadger/dreamberd-interpreter

@@ -2,10 +2,10 @@
 name = "dreamberd"
 version = "0.2.0"
 edition = "2021"
-authors = ["Vivaan Singhvi <singhvi.vivaan@gmail.com>"]
+authors = ["James HoneyBadger <your-email@example.com>"]
 description = "An interpreter for the perfect programming language, DreamBerd (Rust implementation)"
 license = "MIT"
-repository = "https://github.com/vivaansinghvi07/dreamberd-interpreter"
+repository = "https://github.com/James-HoneyBadger/dreamberd-interpreter"
 readme = "README-RUST.md"
 
 [dependencies]

@@ -21,7 +21,7 @@ The Rust port offers several advantages over the Python version:
 
 ```bash
 # Clone the repository
-git clone https://github.com/vivaansinghvi07/dreamberd-interpreter
+git clone https://github.com/James-HoneyBadger/dreamberd-interpreter
 cd dreamberd-interpreter
 
 # Build the project
@@ -237,6 +237,7 @@ Same as the original Python version - see [LICENSE](LICENSE) file.
 - Original Python implementation by Vivaan Singhvi
 - DreamBerd language specification by [TodePond](https://github.com/TodePond/DreamBerd)
 - Rust port also by Vivaan Singhvi
+- Maintained by James HoneyBadger
 
 ## Why DreamBerd?
 
