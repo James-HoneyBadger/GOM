@@ -4,6 +4,97 @@ This is the interpreter for the perfect programming language. It is made in Pyth
 
 This is incredibly slow. My implementation of DreamBerd is suboptimal, which itself runs on a subperformant language (Python), which runs on a pretty fast language (C). However, speed was never a focus in creating my interpreter for DreamBerd and shouldn't be - it's not a language meant for day-to-day use - it's a work of art.
 
+## DreamBerd IDE
+
+This project includes a comprehensive **native IDE** for DreamBerd development built entirely in Rust.
+
+### Native IDE (`dreamberd-ide`)
+
+A fully native, standalone IDE application with no external dependencies, featuring:
+
+- **🚀 Native Performance**: Built in Rust with zero runtime dependencies
+- **📁 File Management**: Native file dialogs for opening and saving DreamBerd files
+- **🎨 Multiple Themes**: Light, Dark, and Custom color schemes
+- **🔤 Font Customization**: Adjustable font sizes (8-24pt)
+- **🐛 Debug Panel**: Variable inspection and breakpoint management
+- **⚡ Real-time Execution**: Direct integration with the DreamBerd interpreter
+- **📱 Cross-platform**: Works on Windows, macOS, and Linux
+
+#### Building the Native IDE
+
+```bash
+# Development build
+cargo build --bin dreamberd-ide
+
+# Release build (recommended)
+cargo build --release --bin dreamberd-ide
+
+# Run the IDE
+cargo run --bin dreamberd-ide
+# Or with release build:
+./target/release/dreamberd-ide
+```
+
+#### IDE Features
+
+**Code Editor**
+- Multi-line text editing with syntax highlighting preparation
+- Real-time syntax validation
+- Font size adjustment
+- Theme switching
+
+**File Operations**
+- Open DreamBerd files (.db extension)
+- Save and Save As functionality
+- New file creation
+- Native file dialogs
+
+**Execution & Debugging**
+- Run code directly in the IDE
+- Real-time output display
+- Error reporting and debugging
+- Variable inspection panel
+- Breakpoint management
+
+**User Interface**
+- Resizable panels (2-column or 3-column with debug panel)
+- Status bar with file info and execution status
+- Customizable themes and fonts
+- Professional IDE layout
+
+#### Example Usage
+
+1. **Launch the IDE**:
+   ```bash
+   ./target/release/dreamberd-ide
+   ```
+
+2. **Create or Open a File**:
+   - Click "New" for a blank file
+   - Click "Open" to load existing DreamBerd code
+
+3. **Write Code**:
+   ```dreamberd
+   print 'Hello from DreamBerd IDE!';
+   
+   const name = 'DreamBerd';
+   print 'Welcome to ' + name + ' development!';
+   ```
+
+4. **Run and Debug**:
+   - Click "Run" to execute
+   - View output in the right panel
+   - Enable "Debug Panel" for variable inspection
+
+#### Distribution
+
+The native IDE can be distributed as a single executable file:
+- **Linux**: `dreamberd-ide` (13MB)
+- **Windows**: `dreamberd-ide.exe`
+- **macOS**: `dreamberd-ide`
+
+No installation required - just run the executable!
+
 ## Installation
 
 You can install DreamBerd from PyPi, by doing any the following:

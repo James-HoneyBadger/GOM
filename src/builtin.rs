@@ -1,11 +1,8 @@
 // Built-in types and values for DreamBerd
 // Rust port of dreamberd/builtin.py
 
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fmt;
-use std::rc::Rc;
-use std::cell::RefCell;
+// use std::fmt;
 
 use crate::processor::syntax_tree::CodeStatement;
 
@@ -18,7 +15,7 @@ pub fn is_int(x: f64) -> bool {
 }
 
 /// DreamBerd value types
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum DreamberdValue {
     Number(DreamberdNumber),
     String(DreamberdString),
@@ -32,6 +29,26 @@ pub enum DreamberdValue {
     SpecialBlank(DreamberdSpecialBlankValue),
     Keyword(DreamberdKeyword),
     Promise(DreamberdPromise),
+}
+
+impl PartialEq for DreamberdValue {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (DreamberdValue::Number(a), DreamberdValue::Number(b)) => a == b,
+            (DreamberdValue::String(a), DreamberdValue::String(b)) => a == b,
+            (DreamberdValue::Boolean(a), DreamberdValue::Boolean(b)) => a == b,
+            (DreamberdValue::List(a), DreamberdValue::List(b)) => a == b,
+            (DreamberdValue::Map(a), DreamberdValue::Map(b)) => a == b,
+            (DreamberdValue::Function(a), DreamberdValue::Function(b)) => a == b,
+            (DreamberdValue::BuiltinFunction(a), DreamberdValue::BuiltinFunction(b)) => a == b,
+            (DreamberdValue::Object(a), DreamberdValue::Object(b)) => a == b,
+            (DreamberdValue::Undefined(a), DreamberdValue::Undefined(b)) => a == b,
+            (DreamberdValue::SpecialBlank(a), DreamberdValue::SpecialBlank(b)) => a == b,
+            (DreamberdValue::Keyword(a), DreamberdValue::Keyword(b)) => a == b,
+            (DreamberdValue::Promise(a), DreamberdValue::Promise(b)) => a == b,
+            _ => false,
+        }
+    }
 }
 
 impl DreamberdValue {
@@ -54,7 +71,7 @@ impl DreamberdValue {
 }
 
 /// Number type
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdNumber {
     pub value: f64,
 }
@@ -66,7 +83,7 @@ impl DreamberdNumber {
 }
 
 /// String type with indexing support
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdString {
     pub value: String,
     pub indexer: HashMap<i64, (usize, String)>, // Maps user index to (position, remaining)
@@ -83,8 +100,14 @@ impl DreamberdString {
     }
 }
 
+impl std::fmt::Display for DreamberdString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}
+
 /// Boolean type (can be true, false, or maybe)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdBoolean {
     pub value: Option<bool>, // None represents "maybe"
 }
@@ -108,7 +131,7 @@ impl DreamberdBoolean {
 }
 
 /// List type with custom indexing
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdList {
     pub values: Vec<DreamberdValue>,
     pub indexer: HashMap<i64, usize>, // Maps user index to actual index
@@ -126,7 +149,7 @@ impl DreamberdList {
 }
 
 /// Map/dictionary type
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdMap {
     pub values: HashMap<String, DreamberdValue>,
 }
@@ -140,7 +163,7 @@ impl DreamberdMap {
 }
 
 /// Function type
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdFunction {
     pub name: String,
     pub args: Vec<String>,
@@ -149,42 +172,50 @@ pub struct DreamberdFunction {
 }
 
 /// Built-in function type
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct BuiltinFunction {
     pub name: String,
     pub arg_count: i32, // -1 means variadic
+    pub function: fn(&[DreamberdValue]) -> Option<DreamberdValue>,
+}
+
+impl PartialEq for BuiltinFunction {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name && self.arg_count == other.arg_count
+        // Note: We can't compare function pointers, so we just compare name and arg_count
+    }
 }
 
 /// Object type (class instances)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdObject {
     pub class_name: String,
     pub namespace: HashMap<String, DreamberdValue>,
 }
 
 /// Undefined type
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdUndefined;
 
 /// Special blank value (for optional parameters)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdSpecialBlankValue;
 
 /// Keyword type (for reassignable keywords)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdKeyword {
     pub value: String,
 }
 
 /// Promise type (for async/next operations)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct DreamberdPromise {
     pub resolved: bool,
     pub value: Option<Box<DreamberdValue>>,
 }
 
 /// Variable lifetime information
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct VariableLifetime {
     pub value: DreamberdValue,
     pub duration: u64, // Lines or time units
@@ -193,8 +224,20 @@ pub struct VariableLifetime {
     pub can_edit_value: bool,
 }
 
+impl VariableLifetime {
+    pub fn new(value: DreamberdValue, duration: u64, confidence: i32, can_be_reset: bool, can_edit_value: bool) -> Self {
+        VariableLifetime {
+            value,
+            duration,
+            confidence,
+            can_be_reset,
+            can_edit_value,
+        }
+    }
+}
+
 /// Variable with multiple lifetimes
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Variable {
     pub name: String,
     pub lifetimes: Vec<VariableLifetime>,
@@ -305,5 +348,14 @@ pub fn db_not(value: &DreamberdBoolean) -> DreamberdBoolean {
         Some(true) => DreamberdBoolean::false_val(),
         Some(false) => DreamberdBoolean::true_val(),
         None => DreamberdBoolean::maybe(),
+    }
+}
+
+/// Create a builtin function
+pub fn create_builtin_function(name: &str, arg_count: i32, function: fn(&[DreamberdValue]) -> Option<DreamberdValue>) -> BuiltinFunction {
+    BuiltinFunction {
+        name: name.to_string(),
+        arg_count,
+        function,
     }
 }

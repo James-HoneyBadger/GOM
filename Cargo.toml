@@ -1,24 +1,12 @@
 [package]
 name = "dreamberd"
-
-pub mod builtin;version = "0.2.0"
-
-pub mod interpreter;edition = "2021"
-
-pub mod processor;authors = ["Vivaan Singhvi <singhvi.vivaan@gmail.com>"]
-
-pub mod serialize;description = "An interpreter for the perfect programming language, DreamBerd (Rust implementation)"
-
+version = "0.2.0"
+edition = "2021"
+authors = ["Vivaan Singhvi <singhvi.vivaan@gmail.com>"]
+description = "An interpreter for the perfect programming language, DreamBerd (Rust implementation)"
 license = "MIT"
-
-pub use base::{Token, TokenType, DreamberdError};repository = "https://github.com/vivaansinghvi07/dreamberd-interpreter"
-
-pub use interpreter::Interpreter;readme = "README-RUST.md"
-
-
-[[bin]]
-name = "dreamberd"
-path = "src/main.rs"
+repository = "https://github.com/vivaansinghvi07/dreamberd-interpreter"
+readme = "README-RUST.md"
 
 [dependencies]
 # CLI and REPL
@@ -52,11 +40,25 @@ regex = "1.10"
 lazy_static = "1.5"
 unicode-segmentation = "1.11"
 
+# GUI for IDE
+eframe = "0.27"
+egui = "0.27"
+egui_extras = "0.27"
+syntect = { version = "5.2", features = ["default-syntaxes", "default-themes"] }
+rfd = "0.14"
+
 [features]
 default = []
 input = ["device_query"]
 globals = ["reqwest", "octocrab"]
 full = ["input", "globals"]
+
+[[bin]]
+name = "dreamberd"
+
+[[bin]]
+name = "dreamberd-ide"
+path = "src/ide.rs"
 
 [profile.release]
 opt-level = 3

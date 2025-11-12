@@ -26,6 +26,8 @@ pub enum TokenType {
     LCurly,    // {
     RSquare,   // ]
     LSquare,   // [
+    LParen,    // (
+    RParen,    // )
 
     // Operators
     Dot,       // .
@@ -55,6 +57,9 @@ pub enum TokenType {
     Pipe,         // |
     And,          // &
 
+    // Literals
+    Number,       // numeric literal
+
     // Special
     Whitespace,
     Name,
@@ -71,6 +76,8 @@ impl TokenType {
             "{" => Some(TokenType::LCurly),
             "]" => Some(TokenType::RSquare),
             "[" => Some(TokenType::LSquare),
+            "(" => Some(TokenType::LParen),
+            ")" => Some(TokenType::RParen),
             "." => Some(TokenType::Dot),
             "+" => Some(TokenType::Add),
             "++" => Some(TokenType::Increment),
@@ -106,6 +113,8 @@ impl TokenType {
             TokenType::LCurly => "{",
             TokenType::RSquare => "]",
             TokenType::LSquare => "[",
+            TokenType::LParen => "(",
+            TokenType::RParen => ")",
             TokenType::Dot => ".",
             TokenType::Add => "+",
             TokenType::Increment => "++",
@@ -128,6 +137,7 @@ impl TokenType {
             TokenType::NotEqual => ";=",
             TokenType::Pipe => "|",
             TokenType::And => "&",
+            TokenType::Number => "NUMBER",
             TokenType::Newline => "\n",
             TokenType::SingleQuote => "'",
             TokenType::DoubleQuote => "\"",
