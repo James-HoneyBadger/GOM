@@ -530,6 +530,11 @@ fn parse_when_statement(
 
     let body = parse_statement_block(tokens, pos, filename, code)?;
 
+    // Consume trailing ! if present (statement terminator)
+    if *pos < tokens.len() && tokens[*pos].token_type == crate::base::TokenType::Bang {
+        *pos += 1;
+    }
+
     Ok(CodeStatement::WhenStatement(WhenStatement {
         condition,
         body,
@@ -818,7 +823,7 @@ fn collect_expression_tokens(tokens: &[Token], pos: &mut usize) -> Vec<Token> {
         crate::base::TokenType::Newline, // Stop at newlines - end of statement
         // Note: Semicolon handled specially - NOT operator in expressions, statement terminator in statements
         crate::base::TokenType::RCurly, // End of block
-        // Bang (!) is NOT a stop token - it's part of confidence levels in Gulf of Mexico
+        crate::base::TokenType::Bang, // Stop at statement terminator
     ];
     
     let mut expr_tokens: Vec<Token> = Vec::new();
