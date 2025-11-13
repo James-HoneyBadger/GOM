@@ -38,18 +38,21 @@ cargo run --bin dreamberd-ide
 #### IDE Features
 
 **Code Editor**
+
 - Multi-line text editing with syntax highlighting preparation
 - Real-time syntax validation
 - Font size adjustment
 - Theme switching
 
 **File Operations**
+
 - Open Gulf of Mexico files (.gom extension)
 - Save and Save As functionality
 - New file creation
 - Native file dialogs
 
 **Execution & Debugging**
+
 - Run code directly in the IDE
 - Real-time output display
 - Error reporting and debugging
@@ -57,6 +60,7 @@ cargo run --bin dreamberd-ide
 - Breakpoint management
 
 **User Interface**
+
 - Resizable panels (2-column or 3-column with debug panel)
 - Status bar with file info and execution status
 - Customizable themes and fonts
@@ -65,6 +69,7 @@ cargo run --bin dreamberd-ide
 #### Example Usage
 
 1. **Launch the IDE**:
+
    ```bash
    ./target/release/dreamberd-ide
    ```
@@ -74,6 +79,7 @@ cargo run --bin dreamberd-ide
    - Click "Open" to load existing Gulf of Mexico code
 
 3. **Write Code**:
+
    ```dreamberd
    print 'Hello from Gulf of Mexico IDE!';
    
@@ -89,6 +95,7 @@ cargo run --bin dreamberd-ide
 #### Distribution
 
 The native IDE can be distributed as a single executable file:
+
 - **Linux**: `dreamberd-ide` (13MB)
 - **Windows**: `dreamberd-ide.exe`
 - **macOS**: `dreamberd-ide`
@@ -100,10 +107,10 @@ No installation required - just run the executable!
 You can install Gulf of Mexico from PyPi, by doing any the following:
 
 ```
-$ pip install dreamberd 
-$ pip install "dreamberd[input, globals]"
-$ pip install "dreamberd[input]"
-$ pip install "dreamberd[globals]"
+pip install dreamberd 
+pip install "dreamberd[input, globals]"
+pip install "dreamberd[input]"
+pip install "dreamberd[globals]"
 ```
 
 Each of these commands installs Gulf of Mexico with the respective dependencies. `input` installs the `pynput` package and allows the use of `after` statements and event watchers. `globals` installs `PyGithub` and allows you to declare `const const const` variables that are publically stored using GitHub. Note: to use the latter, you must enter a [Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) in the `GITHUB_ACCESS_TOKEN` environment variable.
@@ -123,7 +130,7 @@ options:
   -s, --show-traceback  show the full Python trackback upon errors
 ```
 
-## TODO 
+## TODO
 
 - Add another expression type which is just the dot operator, used for indexing and accessing names
 - Better debugging (pretty limited for the time being)
@@ -136,7 +143,7 @@ options:
 The goal of this project is to implement every feature from the Gulf of Mexico language. A list of features is in the README file of the project, linked [here](https://github.com/TodePond/GulfOfMexico---e-acc). Here is a working list of features that there is no chance I will implement (new features may be added - or I should say, removed - as I work on this project and realize I'm too stupid to implement them):
 
 - DB3X: I am not going to even try to parse XML AND parse DB code.
-- Regex: Since type hints seem to not even do anything there is no point in implementing a Regex parser. 
+- Regex: Since type hints seem to not even do anything there is no point in implementing a Regex parser.
 - "Variable Hoisting" (being able to declare variables with a negative lifetime): Given the fact that keywords can be renamed and reassigned in this language, it does not make sense to implement this as the following breaks:
 
     ```javascript
@@ -144,6 +151,7 @@ The goal of this project is to implement every feature from the Gulf of Mexico l
     var const = "lol";
     const const name<-2> = "Jake";
     ```
+
     It is impossible to evaluate the expression on the right side of the `name` declaration after the print statement. Additionally, doing so doesn't account for possible renaming of keywords in the second line.
 - Any sort of autocomplete requires more brainpower than I am willing to put in.
 
@@ -151,9 +159,9 @@ To my knowledge, everything else has been or will be implemented.
 
 ## Implemented Features
 
-These are features that are implemented according to the [GulfOfMexico specification](https://github.com/TodePond/GulfOfMexico---e-acc) in this interpreter. 
+These are features that are implemented according to the [GulfOfMexico specification](https://github.com/TodePond/GulfOfMexico---e-acc) in this interpreter.
 
-### Exclamation Marks!
+### Exclamation Marks
 
 Be bold! End every statement with an exclamation mark!
 
@@ -228,10 +236,15 @@ This is added by me (the interpreter)! I wanted to share how this works.
 
 Thanks to [this repo](https://github.com/marcizhu/marcizhu) for helpful reference for issues and actions in Python.
 
-To store public globals, the following steps are taken:
+**Local Storage (Primary):** Immutable constants are stored locally in your home directory under `~/.dreamberd_runtime/.immutable_constants` and `~/.dreamberd_runtime/.immutable_constants_values/`. This ensures they persist across sessions and work offline.
+
+**Global Storage (Optional):** When possible, constants are also shared globally via GitHub Issues API:
+
 - On the user's side, open a GitHub issue with a title of the format `Create Public Global: {name};;;{confidence}` and the body containing the pickled version of the value.
 - Then, run a GitHub workflow that puts the issue body into a file under `global_objects/` and add an entry to `public_globals.txt` that contains the `name;;;id;;;confidence`
 - Finally, to retrieve these values, the content of each of these files is fetched and converted back into values.
+
+If GitHub is unavailable (no internet, no API token), the constants still work perfectly - they're just stored locally only.
 
 ### Naming
 
@@ -282,16 +295,17 @@ when (health = 0) {
 }
 ```
 
-#### Technical Info 
+#### Technical Info
 
 Hi! It's me again. I took some creative liberty implementing the `when` statement, here's how it works:
 
 - When defined, gather a list of names that are used in the expression of the statement.
 - If a variable is detected, cause the when satement to watch that variable.
-    - This is done in order to avoid watching names instead of variables when, say, a different variable with the same name is defined in a different scope.
-    - Speaking of scope, when statements for which changes are detected in a different scope (from that of definition) **use that scope within their code**.
-        - Looking back on my design decision, I am probably going to change this to make them always use the scope where they were defined.
+  - This is done in order to avoid watching names instead of variables when, say, a different variable with the same name is defined in a different scope.
+  - Speaking of scope, when statements for which changes are detected in a different scope (from that of definition) **use that scope within their code**.
+    - Looking back on my design decision, I am probably going to change this to make them always use the scope where they were defined.
 - Additionally, if a variable detected contains a mutable value, that mutable value is also watched, so the following code detects a change:
+
     ```javascript
     const var l = [1, 2, 3]!
     when (l.length === 4) {
@@ -471,8 +485,8 @@ const const name = Luke!
 
 - To parse strings with many quotes, the interpreter scans the code for the shortest possible string.
 - As soon as a pair of quote groups is found that is equal in terms of quote count on both sides, that is considered a string.
-    - For example, `""""""` reads the two first double quotes, detects that there is a pair (`"` and `"`), and returns the corresponding empty string. This is repeated twice for the two remaining pairs of double quotes.
-    - Therefore, to avoid premature detections of strings, simply create your starting quote with a single `'` and any number of `"`, like so: `'"""Hello world!'''''''`
+  - For example, `""""""` reads the two first double quotes, detects that there is a pair (`"` and `"`), and returns the corresponding empty string. This is repeated twice for the two remaining pairs of double quotes.
+  - Therefore, to avoid premature detections of strings, simply create your starting quote with a single `'` and any number of `"`, like so: `'"""Hello world!'''''''`
 - This is as complicated as it is in order to allow the declaration of empty strings without many problems.
 
 ### String Interpolation
@@ -495,14 +509,14 @@ Type annotations are optional.
 ```javascript
 const var age: Int = 28!
 ```
- 
+
 By the way, strings are just arrays of characters.
 
 ```javascript
 String == Char[]!
 ```
 
-Similarly, integers are just arrays of digits. Hello again! Because of this, you can index into integers! 
+Similarly, integers are just arrays of digits. Hello again! Because of this, you can index into integers!
 
 ```javascript
 const var my_number = 20!

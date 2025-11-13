@@ -115,6 +115,8 @@ OBJECT_EQUALITY_RATIO = 0.6
 DB_RUNTIME_PATH = ".dreamberd_runtime"
 INF_VAR_PATH = ".inf_vars"
 INF_VAR_VALUES_PATH = ".inf_vars_values"
+IMMUTABLE_CONSTANTS_PATH = ".immutable_constants"
+IMMUTABLE_CONSTANTS_VALUES_PATH = ".immutable_constants_values"
 DB_VAR_TO_VALUE_SEP = ";;;"  # i'm feeling fancy
 
 # :D
@@ -309,7 +311,81 @@ def load_global_dreamberd_variables(namespaces: list[Namespace]) -> None:
             )
 
 
+def load_local_immutable_constants(namespaces: list[Namespace]) -> None:
+    """Load locally stored immutable constants (const const const variables)."""
+    dir_path = Path().home() / DB_RUNTIME_PATH
+    immutable_values_path = dir_path / IMMUTABLE_CONSTANTS_VALUES_PATH
+    immutable_list = dir_path / IMMUTABLE_CONSTANTS_PATH
+
+    if not dir_path.is_dir():
+        return
+    if not immutable_values_path.is_dir():
+        return
+    if not immutable_list.is_file():
+        return
+
+    with open(immutable_list, "r") as f:
+        for line in f.readlines():
+            if not line.strip():
+                continue
+
+            try:
+                name, identity, confidence = line.split(DB_VAR_TO_VALUE_SEP)
+                with open(
+                    dir_path / IMMUTABLE_CONSTANTS_VALUES_PATH / identity, "rb"
+                ) as data_f:
+                    value = pickle.load(data_f)
+                # Immutable constants: can_be_reset=False, can_edit_value=False
+                namespaces[-1][name] = Variable(
+                    name,
+                    [
+                        VariableLifetime(
+                            value,
+                            100000000000,  # Effectively infinite
+                            int(confidence),
+                            False,  # can_be_reset
+                            False,  # can_edit_value
+                        )
+                    ],
+                    [],
+                )
+            except (ValueError, FileNotFoundError, pickle.UnpicklingError):
+                # Skip malformed entries
+                continue
+
+
+def save_local_immutable_constant(
+    name: str, value: DreamberdValue, confidence: int
+) -> None:
+    """Save an immutable constant locally."""
+    dir_path = Path().home() / DB_RUNTIME_PATH
+    immutable_values_path = dir_path / IMMUTABLE_CONSTANTS_VALUES_PATH
+
+    # Create directories if they don't exist
+    if not dir_path.is_dir():
+        dir_path.mkdir()
+    if not immutable_values_path.is_dir():
+        immutable_values_path.mkdir()
+
+    # Generate unique ID
+    generated_addr = random.randint(1, 100000000000)
+
+    # Save to list file
+    with open(dir_path / IMMUTABLE_CONSTANTS_PATH, "a") as f:
+        SEP = DB_VAR_TO_VALUE_SEP
+        f.write(f"{name}{SEP}{generated_addr}{SEP}{confidence}\n")
+
+    # Save value
+    with open(
+        dir_path / IMMUTABLE_CONSTANTS_VALUES_PATH / str(generated_addr), "wb"
+    ) as f:
+        pickle.dump(value, f)
+
+
 def load_public_global_variables(namespaces: list[Namespace]) -> None:
+    # First load locally stored immutable constants
+    load_local_immutable_constants(namespaces)
+
     try:
         repo_url = "https://raw.githubusercontent.com/James-HoneyBadger/dreamberd-interpreter-globals-patched/main"
         response = requests.get(f"{repo_url}/public_globals.txt", timeout=5)
@@ -329,49 +405,27 @@ def load_public_global_variables(namespaces: list[Namespace]) -> None:
                 serialized_value = serialized_value_response.text
 
                 value = deserialize_obj(json.loads(serialized_value))
-                namespaces[-1][name] = Variable(
-                    name,
-                    [
-                        VariableLifetime(
-                            value,
-                            100000000000,
-                            int(confidence),
-                            can_be_reset,
-                            can_edit_value,
-                        )
-                    ],
-                    [],
-                )
+                # Only add if not already loaded from local storage
+                if name not in namespaces[-1]:
+                    namespaces[-1][name] = Variable(
+                        name,
+                        [
+                            VariableLifetime(
+                                value,
+                                100000000000,
+                                int(confidence),
+                                can_be_reset,
+                                can_edit_value,
+                            )
+                        ],
+                        [],
+                    )
             except (ValueError, json.JSONDecodeError, requests.RequestException):
                 # Skip malformed lines or failed requests
                 continue
     except requests.RequestException:
-        # If we can't load public globals, provide essential fallback variables
-        print(
-            "\033[33mWarning: Could not load public global variables. Using fallback values.\033[39m"
-        )
-        # Provide essential variables that the interpreter needs
-        from dreamberd.builtin import (
-            DreamberdNumber,
-            BuiltinFunction,
-            db_to_number,
-            db_to_string,
-            db_print,
-        )
-
-        essential_vars = {
-            "true": DreamberdNumber(1),
-            "false": DreamberdNumber(0),
-            "null": None,
-            "undefined": None,
-        }
-        for name, value in essential_vars.items():
-            if value is not None:
-                namespaces[-1][name] = Variable(
-                    name,
-                    [VariableLifetime(value, 100000000000, 100, False, False)],
-                    [],
-                )
+        # If we can't load public globals, that's okay - we already loaded local ones
+        pass
 
 
 def open_global_variable_issue(name: str, value: DreamberdValue, confidence: int):
@@ -547,7 +601,16 @@ def declare_new_variable(
         )  # that name is now set to a variable, discard it from the when statement  --  it is now a var not a string
 
     if is_global:
-        open_global_variable_issue(name, value, confidence)
+        # Always save locally first
+        save_local_immutable_constant(name, value, confidence)
+
+        # Try to create GitHub issue, but don't fail if it doesn't work
+        try:
+            open_global_variable_issue(name, value, confidence)
+        except Exception:
+            # GitHub storage failed, but local storage succeeded
+            # This is acceptable - the variable is still immutable locally
+            pass
 
     if lifetime == "Infinity":
         # if len(namespaces) == 1: continue  # only save global vars if they are in the global scope

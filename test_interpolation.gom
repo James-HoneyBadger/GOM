@@ -1,0 +1,4 @@
+const const name = "Gulf of Mexico"!
+print("Hello ${name}!")!
+print("Hello £{name}!")!
+print("Hello ¥{name}!")!
