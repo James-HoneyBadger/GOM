@@ -1,3 +1,4 @@
 print "before"!
 print x!
-var x = "hoisted"!
+var x <-1> = "0"!
+var x <-1> = "hoisted"!
