@@ -635,7 +635,8 @@ def assign_variable(
 
         # goes down the list until it can assign something in the list
         def assign_variable_helper(
-            value_to_modify: GulfOfMexicoValue, remaining_indexes: list[GulfOfMexicoValue]
+            value_to_modify: GulfOfMexicoValue,
+            remaining_indexes: list[GulfOfMexicoValue],
         ):
             if not value_to_modify or not isinstance(
                 value_to_modify, GulfOfMexicoIndexable
@@ -792,7 +793,9 @@ def perform_single_value_operation(
     )
 
 
-def is_approx_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
+def is_approx_equal(
+    left: GulfOfMexicoValue, right: GulfOfMexicoValue
+) -> GulfOfMexicoBoolean:
     """Approximate equality with fuzzy matching based on ratios."""
     if type(left) != type(right):
         return GulfOfMexicoBoolean(False)
@@ -896,7 +899,9 @@ def is_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoB
         case GulfOfMexicoNumber():
             if not isinstance(right, GulfOfMexicoNumber):
                 return GulfOfMexicoBoolean(False)
-            return GulfOfMexicoBoolean(abs(left.value - right.value) < FLOAT_TO_INT_PREC)
+            return GulfOfMexicoBoolean(
+                abs(left.value - right.value) < FLOAT_TO_INT_PREC
+            )
 
         case GulfOfMexicoString():
             if not isinstance(right, GulfOfMexicoString):
@@ -956,14 +961,17 @@ def is_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoB
             return GulfOfMexicoBoolean(left == right)
 
 
-def is_really_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
+def is_really_equal(
+    left: GulfOfMexicoValue, right: GulfOfMexicoValue
+) -> GulfOfMexicoBoolean:
     """Really equal - even stricter, checks identity for mutable objects."""
     if type(left) != type(right):
         return GulfOfMexicoBoolean(False)
 
     # For mutable objects, check identity
     if isinstance(
-        left, (GulfOfMexicoList, GulfOfMexicoMap, GulfOfMexicoObject, GulfOfMexicoString)
+        left,
+        (GulfOfMexicoList, GulfOfMexicoMap, GulfOfMexicoObject, GulfOfMexicoString),
     ):
         return GulfOfMexicoBoolean(left is right)
 
@@ -978,7 +986,9 @@ def is_really_really_equal(
     return GulfOfMexicoBoolean(left is right)
 
 
-def is_less_than(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
+def is_less_than(
+    left: GulfOfMexicoValue, right: GulfOfMexicoValue
+) -> GulfOfMexicoBoolean:
     """Less than comparison."""
     if type(left) != type(right):
         return GulfOfMexicoBoolean(False)
@@ -1017,7 +1027,9 @@ def perform_two_value_operation(
 ) -> GulfOfMexicoValue:
     match operator:
         case OperatorType.ADD:
-            if isinstance(left, GulfOfMexicoString) or isinstance(right, GulfOfMexicoString):
+            if isinstance(left, GulfOfMexicoString) or isinstance(
+                right, GulfOfMexicoString
+            ):
                 return GulfOfMexicoString(
                     db_to_string(left).value + db_to_string(right).value
                 )
@@ -2680,7 +2692,9 @@ def interpret_code_statements(
     return result
 
 
-def is_approx_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
+def is_approx_equal(
+    left: GulfOfMexicoValue, right: GulfOfMexicoValue
+) -> GulfOfMexicoBoolean:
     """Approximate equality with fuzzy matching based on ratios."""
     if type(left) != type(right):
         return GulfOfMexicoBoolean(False)
