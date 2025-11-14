@@ -419,6 +419,16 @@ class Variable:
     lifetimes: list[VariableLifetime]
     prev_values: list[DreamberdValue]
 
+    def __init__(
+        self,
+        name: str,
+        lifetimes: list[VariableLifetime],
+        prev_values: list[DreamberdValue],
+    ):
+        self.name = name
+        self.lifetimes = lifetimes
+        self.prev_values = prev_values
+
     @property
     def can_be_reset(self) -> bool:
         if self.lifetimes:
@@ -443,7 +453,7 @@ class Variable:
     ) -> None:
         for i in range(len(self.lifetimes) + 1):
             if i == len(self.lifetimes) or self.lifetimes[i].confidence >= confidence:
-                if i == 0:
+                if i == 0 and self.lifetimes:
                     self.prev_values.append(self.value)
                 self.lifetimes[i:i] = [
                     VariableLifetime(

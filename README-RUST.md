@@ -1,6 +1,6 @@
 # Gulf of Mexico Interpreter (Rust Edition)
 
-This is a **Rust implementation** of the interpreter for the perfect programming language, GulfOfMexico. 
+This is a **Rust implementation** of the interpreter for the perfect programming language, GulfOfMexico.
 
 > **Note:** This is a complete rewrite of the original Python interpreter in Rust, focusing on performance, type safety, and modern systems programming practices.
 
@@ -150,6 +150,7 @@ The following features require full parser and interpreter implementation:
 *(These benchmarks will be added once the full interpreter is implemented)*
 
 Expected improvements over Python:
+
 - Startup time: ~50-100ms vs ~200-500ms (Python)
 - Simple arithmetic: ~10-50x faster
 - Complex recursion: ~20-100x faster
@@ -212,6 +213,44 @@ All Gulf of Mexico features from the [specification](https://github.com/TodePond
 - And much more!
 
 See the main [README.md](README.md) for the complete feature list.
+
+### New in the Rust interpreter
+
+- Keyword aliasing with persistence and dynamic mid-file support
+  - Builtins:
+    - `alias(original: string, new_name: string) -> bool`
+    - `unalias(name: string) -> bool`
+    - `list_aliases() -> map`
+    - `unalias_all([persist: boolean=true]) -> bool`
+    - `canonical_keywords() -> list` - Returns list of available canonical keywords
+  - Aliases are persisted at `~/.dreamberd_runtime/aliases.json`.
+  - Canonicalization is applied:
+    - In the REPL before parsing
+    - In file execution per-statement (streaming), enabling aliases defined earlier in the file to affect later code
+    - During imports and string interpolation expressions
+
+- Synthetic input event injection for testing `after` statements
+  - Builtin: `trigger(event: string, [times: number=1])`
+  - Examples:
+    - `trigger("keydown:A")!`
+    - `trigger("click")!` (alias for a generic click)
+    - `trigger("click", 3)!` (fires three times)
+  - Persistent after-handlers (`after persist "..." { ... }`) are re-queued after firing and will respond to subsequent events.
+
+Usage examples:
+
+```gom
+// Define an alias and use it immediately in the same file
+alias("function", "mk")!
+mk hello() { print("hi")! }!
+hello()!
+
+// Persistent after handler and synthetic trigger
+const cnt = 0!
+after persist "click" { const cnt = current(cnt) + 1! }!
+trigger("click", 2)!
+// cnt is now 2
+```
 
 ## Contributing
 

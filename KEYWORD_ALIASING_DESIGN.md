@@ -69,6 +69,8 @@ Optional Phase 1 addition: `unalias(name)` removing mapping. Fails silently if n
 
 Builtin `list_aliases()` returns a list/map serialization of current alias mappings.
 
+Builtin `canonical_keywords()` returns a list of all available canonical keywords that can be aliased (e.g. `["function", "func", "fun", "fn", "if", "when", ...]`). Useful for discovering valid targets for `alias(original, newName)` calls.
+
 ## Edge Cases
 
 - Attempt to alias to an existing alias name: reject.

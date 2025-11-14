@@ -12,8 +12,6 @@ pygithub = "2.2.0"
 requests = "2.31.0"
 
 [tool.poetry.scripts]
-dreamberd = "dreamberd:main"
-dreamberd-ide = "dreamberd_ide:main"
 
 [tool.poetry.extras]
 input = ["pynput"]
