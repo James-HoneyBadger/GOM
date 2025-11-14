@@ -21,14 +21,14 @@ The Rust port offers several advantages over the Python version:
 
 ```bash
 # Clone the repository
-git clone https://github.com/James-HoneyBadger/dreamberd-interpreter
-cd dreamberd-interpreter
+git clone https://github.com/James-HoneyBadger/GulfOfMexico-interpreter
+cd GulfOfMexico-interpreter
 
 # Build the project
 cargo build --release
 
-# The binary will be at target/release/dreamberd
-./target/release/dreamberd
+# The binary will be at target/release/GulfOfMexico
+./target/release/GulfOfMexico
 ```
 
 ### Install with Cargo
@@ -59,7 +59,7 @@ cargo build --release --features full
 Run the interpreter without arguments to start an interactive REPL:
 
 ```bash
-dreamberd
+GulfOfMexico
 ```
 
 ### File Execution
@@ -67,13 +67,13 @@ dreamberd
 Execute a Gulf of Mexico file:
 
 ```bash
-dreamberd myprogram.gom
+GulfOfMexico myprogram.gom
 ```
 
 ### Command-Line Options
 
 ```
-Usage: dreamberd [OPTIONS] [FILE]
+Usage: GulfOfMexico [OPTIONS] [FILE]
 
 Arguments:
   [FILE]  The file containing your Gulf of Mexico code
@@ -166,7 +166,7 @@ cargo build --release
 RUSTFLAGS="-C target-cpu=native" cargo build --release --features full
 
 # Strip debug symbols for smaller binary
-strip target/release/dreamberd
+strip target/release/GulfOfMexico
 ```
 
 ## Development
@@ -223,7 +223,7 @@ See the main [README.md](README.md) for the complete feature list.
     - `list_aliases() -> map`
     - `unalias_all([persist: boolean=true]) -> bool`
     - `canonical_keywords() -> list` - Returns list of available canonical keywords
-  - Aliases are persisted at `~/.dreamberd_runtime/aliases.json`.
+  - Aliases are persisted at `~/.GulfOfMexico_runtime/aliases.json`.
   - Canonicalization is applied:
     - In the REPL before parsing
     - In file execution per-statement (streaming), enabling aliases defined earlier in the file to affect later code

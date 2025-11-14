@@ -75,7 +75,7 @@ Successfully refactored the Gulf of Mexico interpreter from **Python** to **Rust
 ## Project Structure
 
 ```
-dreamberd-interpreter/
+GulfOfMexico-interpreter/
 ├── Cargo.toml                 # Rust project configuration
 ├── README-RUST.md             # Rust-specific documentation
 ├── src/
@@ -90,7 +90,7 @@ dreamberd-interpreter/
 │       ├── lexer.rs           # Tokenizer (280 lines)
 │       ├── syntax_tree.rs     # AST nodes (107 lines)
 │       └── expression_tree.rs # Expression tree (137 lines)
-├── dreamberd/                 # Original Python implementation
+├── GulfOfMexico/                 # Original Python implementation
 └── examples/                  # Gulf of Mexico test programs
 ```
 
@@ -109,8 +109,8 @@ cargo build --release
 cargo test
 
 # Run the interpreter
-./target/release/dreamberd --help
-./target/release/dreamberd  # REPL mode
+./target/release/GulfOfMexico --help
+./target/release/GulfOfMexico  # REPL mode
 ```
 
 ## What's Next (Implementation Priorities)

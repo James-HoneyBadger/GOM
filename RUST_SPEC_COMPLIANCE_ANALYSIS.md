@@ -37,7 +37,7 @@ The Rust interpreter is in **foundation phase** with ~25-30% of specification fe
 
 - Simple one-level alias mapping (new_name → canonical)
 - Builtins: `alias()`, `unalias()`, `list_aliases()`
-- Persistent storage to `~/.dreamberd_runtime/aliases.json`
+- Persistent storage to `~/.GulfOfMexico_runtime/aliases.json`
 - Lexer canonicalization before parsing
 - No variable name collisions
 - Future: mid-file dynamic support
@@ -48,7 +48,7 @@ The Rust interpreter is in **foundation phase** with ~25-30% of specification fe
 
 - ✅ All core builtins: `alias()`, `unalias()`, `list_aliases()`, `unalias_all()`
 - ✅ **BONUS:** `canonical_keywords()` introspection builtin
-- ✅ Full persistence at `~/.dreamberd_runtime/aliases.json`
+- ✅ Full persistence at `~/.GulfOfMexico_runtime/aliases.json`
 - ✅ **BONUS:** Streaming interpreter for dynamic mid-file aliasing
   - Design spec said "alias only active for subsequent parses"
   - Rust impl enables same-file usage: define alias, use immediately below
@@ -500,7 +500,7 @@ The Rust interpreter is in **foundation phase** with ~25-30% of specification fe
 **Spec Requirements:**
 
 - `const const const name = value!` creates global persistent constants
-- Local storage at `~/.dreamberd_runtime/.immutable_constants`
+- Local storage at `~/.GulfOfMexico_runtime/.immutable_constants`
 - GitHub storage (optional) via Issues API
 - Cross-session persistence
 - Global sharing across all users

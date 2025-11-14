@@ -80,7 +80,7 @@ Builtin `canonical_keywords()` returns a list of all available canonical keyword
 
 ## Future Enhancements (Deferred)
 
-- Persistent alias storage across sessions (serialize to `~/.dreamberd_runtime/aliases.json`).
+- Persistent alias storage across sessions (serialize to `~/.GulfOfMexico_runtime/aliases.json`).
 - Scoped aliases (file-level or block-level) with push/pop semantics.
 - Alias precedence rules when colliding with user variable names (opt-in override).
 - IDE integration for hover showing canonical target.

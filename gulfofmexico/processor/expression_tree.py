@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
-from dreamberd.base import (
+from gulfofmexico.base import (
     STR_TO_OPERATOR,
     NonFormattedError,
     Token,

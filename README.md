@@ -9,20 +9,20 @@ This is incredibly slow. My implementation of Gulf of Mexico is suboptimal, whic
 You can install Gulf of Mexico from PyPi, by doing any the following:
 
 ```
-pip install dreamberd 
-pip install "dreamberd[input, globals]"
-pip install "dreamberd[input]"
-pip install "dreamberd[globals]"
+pip install GulfOfMexico 
+pip install "GulfOfMexico[input, globals]"
+pip install "GulfOfMexico[input]"
+pip install "GulfOfMexico[globals]"
 ```
 
 Each of these commands installs Gulf of Mexico with the respective dependencies. `input` installs the `pynput` package and allows the use of `after` statements and event watchers. `globals` installs `PyGithub` and allows you to declare `const const const` variables that are publically stored using GitHub. Note: to use the latter, you must enter a [Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) in the `GITHUB_ACCESS_TOKEN` environment variable.
 
 ## Usage
 
-Now that you have installed GulfOfMexico, you can run the REPL using the `$ dreamberd` command, or you can run a file using `$ dreamberd FILE`. Usage instructions here:
+Now that you have installed GulfOfMexico, you can run the REPL using the `$ GulfOfMexico` command, or you can run a file using `$ GulfOfMexico FILE`. Usage instructions here:
 
 ```
-usage: dreamberd [-h] [-s] [file]
+usage: GulfOfMexico [-h] [-s] [file]
 
 positional arguments:
   file                  the file containing your Gulf of Mexico code
@@ -138,7 +138,7 @@ This is added by me (the interpreter)! I wanted to share how this works.
 
 Thanks to [this repo](https://github.com/marcizhu/marcizhu) for helpful reference for issues and actions in Python.
 
-**Local Storage (Primary):** Immutable constants are stored locally in your home directory under `~/.dreamberd_runtime/.immutable_constants` and `~/.dreamberd_runtime/.immutable_constants_values/`. This ensures they persist across sessions and work offline.
+**Local Storage (Primary):** Immutable constants are stored locally in your home directory under `~/.GulfOfMexico_runtime/.immutable_constants` and `~/.GulfOfMexico_runtime/.immutable_constants_values/`. This ensures they persist across sessions and work offline.
 
 **Global Storage (Optional):** When possible, constants are also shared globally via GitHub Issues API:
 

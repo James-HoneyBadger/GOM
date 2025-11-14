@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "dreamberd"
+name = "gulfofmexico"
 version = "0.1.1"
 description = "An interpreter for the perfect programming language, GulfOfMexico."
 readme = "README.md"

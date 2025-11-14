@@ -33,7 +33,7 @@ try:
 except ImportError:
     GITHUB_IMPORTED = False
 
-from dreamberd.base import (
+from gulfofmexico.base import (
     InterpretationError,
     NonFormattedError,
     OperatorType,
@@ -44,26 +44,26 @@ from dreamberd.base import (
     raise_error_at_line,
     raise_error_at_token,
 )
-from dreamberd.builtin import (
+from gulfofmexico.builtin import (
     FLOAT_TO_INT_PREC,
     BuiltinFunction,
-    DreamberdBoolean,
-    DreamberdFunction,
-    DreamberdIndexable,
-    DreamberdKeyword,
-    DreamberdList,
-    DreamberdMap,
-    DreamberdMutable,
-    DreamberdNamespaceable,
-    DreamberdNumber,
-    DreamberdObject,
-    DreamberdPromise,
-    DreamberdSpecialBlankValue,
-    DreamberdString,
-    DreamberdUndefined,
+    GulfOfMexicoBoolean,
+    GulfOfMexicoFunction,
+    GulfOfMexicoIndexable,
+    GulfOfMexicoKeyword,
+    GulfOfMexicoList,
+    GulfOfMexicoMap,
+    GulfOfMexicoMutable,
+    GulfOfMexicoNamespaceable,
+    GulfOfMexicoNumber,
+    GulfOfMexicoObject,
+    GulfOfMexicoPromise,
+    GulfOfMexicoSpecialBlankValue,
+    GulfOfMexicoString,
+    GulfOfMexicoUndefined,
     Name,
     Variable,
-    DreamberdValue,
+    GulfOfMexicoValue,
     VariableLifetime,
     db_not,
     db_to_boolean,
@@ -71,9 +71,9 @@ from dreamberd.builtin import (
     db_to_string,
     is_int,
 )
-from dreamberd.serialize import serialize_obj, deserialize_obj
-from dreamberd.processor.lexer import tokenize as db_tokenize
-from dreamberd.processor.expression_tree import (
+from gulfofmexico.serialize import serialize_obj, deserialize_obj
+from gulfofmexico.processor.lexer import tokenize as db_tokenize
+from gulfofmexico.processor.expression_tree import (
     ExpressionTreeNode,
     FunctionNode,
     ListNode,
@@ -84,7 +84,7 @@ from dreamberd.processor.expression_tree import (
     build_expression_tree,
     get_expr_first_token,
 )
-from dreamberd.processor.syntax_tree import (
+from gulfofmexico.processor.syntax_tree import (
     AfterStatement,
     ClassDeclaration,
     CodeStatement,
@@ -112,8 +112,8 @@ MAP_EQUALITY_RATIO = 0.6  # lower thresh cause i feel like it
 FUNCTION_EQUALITY_RATIO = 0.6  # yeah
 OBJECT_EQUALITY_RATIO = 0.6
 
-# thing used in the .dreamberd_runtime file
-DB_RUNTIME_PATH = ".dreamberd_runtime"
+# thing used in the .gulfofmexico_runtime file
+DB_RUNTIME_PATH = ".gulfofmexico_runtime"
 INF_VAR_PATH = ".inf_vars"
 INF_VAR_VALUES_PATH = ".inf_vars_values"
 IMMUTABLE_CONSTANTS_PATH = ".immutable_constants"
@@ -145,7 +145,7 @@ NameWatchers: TypeAlias = dict[
         CodeStatementWithExpression,
         set[tuple[str, int]],
         list[Namespace],
-        Optional[DreamberdPromise],
+        Optional[GulfOfMexicoPromise],
     ],
 ]
 WhenStatementWatchers: TypeAlias = list[
@@ -177,11 +177,11 @@ def get_modified_prev_name(name: str) -> str:
 # i believe this function is exclusively called from the evaluate_expression function
 def evaluate_normal_function(
     expr: FunctionNode,
-    func: Union[DreamberdFunction, BuiltinFunction],
+    func: Union[GulfOfMexicoFunction, BuiltinFunction],
     namespaces: list[Namespace],
-    args: list[DreamberdValue],
+    args: list[GulfOfMexicoValue],
     when_statement_watchers: WhenStatementWatchers,
-) -> DreamberdValue:
+) -> GulfOfMexicoValue:
 
     # check to evaluate builtin
     if isinstance(func, BuiltinFunction):
@@ -193,7 +193,7 @@ def evaluate_normal_function(
                 expr.name,
             )
         max_arg_count = func.arg_count if func.arg_count >= 0 else len(args)
-        return func.function(*args[:max_arg_count]) or DreamberdUndefined()
+        return func.function(*args[:max_arg_count]) or GulfOfMexicoUndefined()
 
     # check length is proper, adjust namespace, and run this code
     if len(func.args) > len(args):
@@ -210,15 +210,15 @@ def evaluate_normal_function(
         interpret_code_statements(
             func.code, namespaces + [new_namespace], [], when_statement_watchers + [{}]
         )
-        or DreamberdUndefined()
+        or GulfOfMexicoUndefined()
     )
 
 
 def register_async_function(
     expr: FunctionNode,
-    func: DreamberdFunction,
+    func: GulfOfMexicoFunction,
     namespaces: list[Namespace],
-    args: list[DreamberdValue],
+    args: list[GulfOfMexicoValue],
     async_statements: AsyncStatements,
 ) -> None:
     """Adds a job to the async statements queue, which is accessed in the interpret_code_statements function."""
@@ -268,7 +268,7 @@ def remove_from_all_when_statement_watchers(
             del watcher_dict[name_or_id]
 
 
-def load_global_dreamberd_variables(namespaces: list[Namespace]) -> None:
+def load_global_gulfofmexico_variables(namespaces: list[Namespace]) -> None:
 
     dir_path = Path().home() / DB_RUNTIME_PATH
     inf_values_path = dir_path / INF_VAR_VALUES_PATH
@@ -356,7 +356,7 @@ def load_local_immutable_constants(namespaces: list[Namespace]) -> None:
 
 
 def save_local_immutable_constant(
-    name: str, value: DreamberdValue, confidence: int
+    name: str, value: GulfOfMexicoValue, confidence: int
 ) -> None:
     """Save an immutable constant locally."""
     dir_path = Path().home() / DB_RUNTIME_PATH
@@ -388,7 +388,7 @@ def load_public_global_variables(namespaces: list[Namespace]) -> None:
     load_local_immutable_constants(namespaces)
 
     try:
-        repo_url = "https://raw.githubusercontent.com/James-HoneyBadger/dreamberd-interpreter-globals-patched/main"
+        repo_url = "https://raw.githubusercontent.com/James-HoneyBadger/gulfofmexico-interpreter-globals-patched/main"
         response = requests.get(f"{repo_url}/public_globals.txt", timeout=5)
         response.raise_for_status()
 
@@ -429,7 +429,7 @@ def load_public_global_variables(namespaces: list[Namespace]) -> None:
         pass
 
 
-def open_global_variable_issue(name: str, value: DreamberdValue, confidence: int):
+def open_global_variable_issue(name: str, value: GulfOfMexicoValue, confidence: int):
     if not GITHUB_IMPORTED:
         raise_error_at_line(
             filename,
@@ -449,13 +449,13 @@ def open_global_variable_issue(name: str, value: DreamberdValue, confidence: int
 
     issue_body = json.dumps(serialize_obj(value))
     with github.Github(auth=github.Auth.Token(access_token)) as g:  # type: ignore
-        repo = g.get_repo("James-HoneyBadger/dreamberd-interpreter-globals")
+        repo = g.get_repo("James-HoneyBadger/gulfofmexico-interpreter-globals")
         repo.create_issue(
             f"Create Public Global: {name}{DB_VAR_TO_VALUE_SEP}{confidence}", issue_body
         )
 
 
-def check_type_annotation(value: DreamberdValue, type_tokens: list[Token]) -> None:
+def check_type_annotation(value: GulfOfMexicoValue, type_tokens: list[Token]) -> None:
     """Check if a value matches the expected type annotation."""
     if not type_tokens:
         return  # No type annotation, nothing to check
@@ -469,28 +469,28 @@ def check_type_annotation(value: DreamberdValue, type_tokens: list[Token]) -> No
 
     # Check type compatibility
     if type_name == "Int":
-        if not isinstance(value, DreamberdNumber):
+        if not isinstance(value, GulfOfMexicoNumber):
             raise InterpretationError(
                 f"Type error: expected Int, got {type(value).__name__}"
             )
     elif type_name == "String":
-        if not isinstance(value, DreamberdString):
+        if not isinstance(value, GulfOfMexicoString):
             raise InterpretationError(
                 f"Type error: expected String, got {type(value).__name__}"
             )
     elif type_name == "Char[]":
-        if not isinstance(value, DreamberdString):
+        if not isinstance(value, GulfOfMexicoString):
             raise InterpretationError(
                 f"Type error: expected Char[], got {type(value).__name__}"
             )
     elif type_name == "Int9":
-        if not isinstance(value, DreamberdNumber):
+        if not isinstance(value, GulfOfMexicoNumber):
             raise InterpretationError(
                 f"Type error: expected Int9, got {type(value).__name__}"
             )
         # Int9 represents binary, but for now we'll just check it's a number
     elif type_name == "Int99":
-        if not isinstance(value, DreamberdNumber):
+        if not isinstance(value, GulfOfMexicoNumber):
             raise InterpretationError(
                 f"Type error: expected Int99, got {type(value).__name__}"
             )
@@ -500,7 +500,7 @@ def check_type_annotation(value: DreamberdValue, type_tokens: list[Token]) -> No
 
 def declare_new_variable(
     statement: VariableDeclaration,
-    value: DreamberdValue,
+    value: GulfOfMexicoValue,
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
@@ -559,7 +559,7 @@ def declare_new_variable(
         condition_val = evaluate_expression(
             condition, namespaces, async_statements, when_statement_watchers
         )
-        if isinstance(value, DreamberdMutable):
+        if isinstance(value, GulfOfMexicoMutable):
             if id(value) not in when_statement_watchers[-1]:
                 when_statement_watchers[-1][id(value)] = []
             when_statement_watchers[-1][id(value)].append(when_watcher)
@@ -570,8 +570,8 @@ def declare_new_variable(
 
 def assign_variable(
     statement: VariableAssignment,
-    indexes: list[DreamberdValue],
-    new_value: DreamberdValue,
+    indexes: list[GulfOfMexicoValue],
+    new_value: GulfOfMexicoValue,
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
@@ -635,10 +635,10 @@ def assign_variable(
 
         # goes down the list until it can assign something in the list
         def assign_variable_helper(
-            value_to_modify: DreamberdValue, remaining_indexes: list[DreamberdValue]
+            value_to_modify: GulfOfMexicoValue, remaining_indexes: list[GulfOfMexicoValue]
         ):
             if not value_to_modify or not isinstance(
-                value_to_modify, DreamberdIndexable
+                value_to_modify, GulfOfMexicoIndexable
             ):
                 raise_error_at_line(
                     filename,
@@ -730,12 +730,12 @@ def assign_variable(
             condition_val = evaluate_expression(
                 condition, namespaces, async_statements, when_statement_watchers
             )
-            if isinstance(new_value, DreamberdMutable):
+            if isinstance(new_value, GulfOfMexicoMutable):
                 when_statement_watchers[-1][id(new_value)].append(
                     when_watcher
                 )  ##### remember : this is tuple so it is immutable and copied !!!!!!!!!!!!!!!!!!!!!!  # wait nvm i suick at pytghon
             if isinstance(
-                var.prev_values[-1], DreamberdMutable
+                var.prev_values[-1], GulfOfMexicoMutable
             ):  # if prev value was being observed under this statement, remove it  ??
                 remove_from_when_statement_watchers(
                     id(var.prev_values[-1]),
@@ -766,17 +766,17 @@ def assign_variable(
 
 
 def perform_single_value_operation(
-    val: DreamberdValue, operator_token: Token
-) -> DreamberdValue:
+    val: GulfOfMexicoValue, operator_token: Token
+) -> GulfOfMexicoValue:
     match operator_token.type:
         case TokenType.SUBTRACT:
             match val:
-                case DreamberdNumber():
-                    return DreamberdNumber(-val.value)
-                case DreamberdList():
-                    return DreamberdList(val.values[::-1])
-                case DreamberdString():
-                    return DreamberdString(val.value[::-1])
+                case GulfOfMexicoNumber():
+                    return GulfOfMexicoNumber(-val.value)
+                case GulfOfMexicoList():
+                    return GulfOfMexicoList(val.values[::-1])
+                case GulfOfMexicoString():
+                    return GulfOfMexicoString(val.value[::-1])
                 case _:
                     raise_error_at_token(
                         filename,
@@ -792,82 +792,82 @@ def perform_single_value_operation(
     )
 
 
-def is_approx_equal(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoolean:
+def is_approx_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
     """Approximate equality with fuzzy matching based on ratios."""
     if type(left) != type(right):
-        return DreamberdBoolean(False)
+        return GulfOfMexicoBoolean(False)
 
     match left:
-        case DreamberdNumber():
-            if not isinstance(right, DreamberdNumber):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoNumber():
+            if not isinstance(right, GulfOfMexicoNumber):
+                return GulfOfMexicoBoolean(False)
             if left.value == right.value:
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             if (
                 abs(left.value) < FLOAT_TO_INT_PREC
                 and abs(right.value) < FLOAT_TO_INT_PREC
             ):
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             ratio = abs(left.value - right.value) / max(
                 abs(left.value), abs(right.value)
             )
-            return DreamberdBoolean(ratio <= NUM_EQUALITY_RATIO)
+            return GulfOfMexicoBoolean(ratio <= NUM_EQUALITY_RATIO)
 
-        case DreamberdString():
-            if not isinstance(right, DreamberdString):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoString():
+            if not isinstance(right, GulfOfMexicoString):
+                return GulfOfMexicoBoolean(False)
             if left.value == right.value:
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             # Use sequence matcher for string similarity
             ratio = SequenceMatcher(None, left.value, right.value).ratio()
-            return DreamberdBoolean(ratio >= STRING_EQUALITY_RATIO)
+            return GulfOfMexicoBoolean(ratio >= STRING_EQUALITY_RATIO)
 
-        case DreamberdList():
-            if not isinstance(right, DreamberdList):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoList():
+            if not isinstance(right, GulfOfMexicoList):
+                return GulfOfMexicoBoolean(False)
             if len(left.values) != len(right.values):
-                return DreamberdBoolean(False)
+                return GulfOfMexicoBoolean(False)
             if len(left.values) == 0:
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             equal_count = 0
             for l_val, r_val in zip(left.values, right.values):
                 if is_approx_equal(l_val, r_val).value:
                     equal_count += 1
             ratio = equal_count / len(left.values)
-            return DreamberdBoolean(ratio >= LIST_EQUALITY_RATIO)
+            return GulfOfMexicoBoolean(ratio >= LIST_EQUALITY_RATIO)
 
-        case DreamberdMap():
-            if not isinstance(right, DreamberdMap):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoMap():
+            if not isinstance(right, GulfOfMexicoMap):
+                return GulfOfMexicoBoolean(False)
             if len(left.self_dict) != len(right.self_dict):
-                return DreamberdBoolean(False)
+                return GulfOfMexicoBoolean(False)
             if len(left.self_dict) == 0:
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             equal_count = 0
             for key in left.self_dict:
                 if key in right.self_dict:
                     if is_approx_equal(left.self_dict[key], right.self_dict[key]).value:
                         equal_count += 1
             ratio = equal_count / len(left.self_dict)
-            return DreamberdBoolean(ratio >= MAP_EQUALITY_RATIO)
+            return GulfOfMexicoBoolean(ratio >= MAP_EQUALITY_RATIO)
 
-        case DreamberdFunction():
-            if not isinstance(right, DreamberdFunction):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoFunction():
+            if not isinstance(right, GulfOfMexicoFunction):
+                return GulfOfMexicoBoolean(False)
             # Functions are equal if they have the same args and code
             if (
                 left.args == right.args
                 and left.code == right.code
                 and left.is_async == right.is_async
             ):
-                return DreamberdBoolean(True)
-            return DreamberdBoolean(False)
+                return GulfOfMexicoBoolean(True)
+            return GulfOfMexicoBoolean(False)
 
-        case DreamberdObject():
-            if not isinstance(right, DreamberdObject):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoObject():
+            if not isinstance(right, GulfOfMexicoObject):
+                return GulfOfMexicoBoolean(False)
             if left.class_name != right.class_name:
-                return DreamberdBoolean(False)
+                return GulfOfMexicoBoolean(False)
             # Compare namespaces
             equal_count = 0
             total_count = len(left.namespace)
@@ -878,49 +878,49 @@ def is_approx_equal(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoo
                     ).value:
                         equal_count += 1
             if total_count == 0:
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             ratio = equal_count / total_count
-            return DreamberdBoolean(ratio >= OBJECT_EQUALITY_RATIO)
+            return GulfOfMexicoBoolean(ratio >= OBJECT_EQUALITY_RATIO)
 
         case _:
             # For other types, use strict equality
-            return DreamberdBoolean(left == right)
+            return GulfOfMexicoBoolean(left == right)
 
 
-def is_equal(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoolean:
+def is_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
     """Regular equality - stricter than approximate."""
     if type(left) != type(right):
-        return DreamberdBoolean(False)
+        return GulfOfMexicoBoolean(False)
 
     match left:
-        case DreamberdNumber():
-            if not isinstance(right, DreamberdNumber):
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(abs(left.value - right.value) < FLOAT_TO_INT_PREC)
+        case GulfOfMexicoNumber():
+            if not isinstance(right, GulfOfMexicoNumber):
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(abs(left.value - right.value) < FLOAT_TO_INT_PREC)
 
-        case DreamberdString():
-            if not isinstance(right, DreamberdString):
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(left.value == right.value)
+        case GulfOfMexicoString():
+            if not isinstance(right, GulfOfMexicoString):
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(left.value == right.value)
 
-        case DreamberdList():
-            if not isinstance(right, DreamberdList):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoList():
+            if not isinstance(right, GulfOfMexicoList):
+                return GulfOfMexicoBoolean(False)
             if len(left.values) != len(right.values):
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(
                 all(
                     is_equal(l_val, r_val).value
                     for l_val, r_val in zip(left.values, right.values)
                 )
             )
 
-        case DreamberdMap():
-            if not isinstance(right, DreamberdMap):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoMap():
+            if not isinstance(right, GulfOfMexicoMap):
+                return GulfOfMexicoBoolean(False)
             if len(left.self_dict) != len(right.self_dict):
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(
                 all(
                     key in right.self_dict
                     and is_equal(left.self_dict[key], right.self_dict[key]).value
@@ -928,21 +928,21 @@ def is_equal(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoolean:
                 )
             )
 
-        case DreamberdFunction():
-            if not isinstance(right, DreamberdFunction):
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(
+        case GulfOfMexicoFunction():
+            if not isinstance(right, GulfOfMexicoFunction):
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(
                 left.args == right.args
                 and left.code == right.code
                 and left.is_async == right.is_async
             )
 
-        case DreamberdObject():
-            if not isinstance(right, DreamberdObject):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoObject():
+            if not isinstance(right, GulfOfMexicoObject):
+                return GulfOfMexicoBoolean(False)
             if left.class_name != right.class_name:
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(
                 all(
                     key in right.namespace
                     and is_equal(
@@ -953,77 +953,77 @@ def is_equal(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoolean:
             )
 
         case _:
-            return DreamberdBoolean(left == right)
+            return GulfOfMexicoBoolean(left == right)
 
 
-def is_really_equal(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoolean:
+def is_really_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
     """Really equal - even stricter, checks identity for mutable objects."""
     if type(left) != type(right):
-        return DreamberdBoolean(False)
+        return GulfOfMexicoBoolean(False)
 
     # For mutable objects, check identity
     if isinstance(
-        left, (DreamberdList, DreamberdMap, DreamberdObject, DreamberdString)
+        left, (GulfOfMexicoList, GulfOfMexicoMap, GulfOfMexicoObject, GulfOfMexicoString)
     ):
-        return DreamberdBoolean(left is right)
+        return GulfOfMexicoBoolean(left is right)
 
     # For immutable objects, use regular equality
     return is_equal(left, right)
 
 
 def is_really_really_equal(
-    left: DreamberdValue, right: DreamberdValue
-) -> DreamberdBoolean:
+    left: GulfOfMexicoValue, right: GulfOfMexicoValue
+) -> GulfOfMexicoBoolean:
     """Really really equal - strictest equality, always checks identity."""
-    return DreamberdBoolean(left is right)
+    return GulfOfMexicoBoolean(left is right)
 
 
-def is_less_than(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoolean:
+def is_less_than(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
     """Less than comparison."""
     if type(left) != type(right):
-        return DreamberdBoolean(False)
+        return GulfOfMexicoBoolean(False)
 
     match left:
-        case DreamberdNumber():
-            if not isinstance(right, DreamberdNumber):
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(left.value < right.value)
+        case GulfOfMexicoNumber():
+            if not isinstance(right, GulfOfMexicoNumber):
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(left.value < right.value)
 
-        case DreamberdString():
-            if not isinstance(right, DreamberdString):
-                return DreamberdBoolean(False)
-            return DreamberdBoolean(left.value < right.value)
+        case GulfOfMexicoString():
+            if not isinstance(right, GulfOfMexicoString):
+                return GulfOfMexicoBoolean(False)
+            return GulfOfMexicoBoolean(left.value < right.value)
 
-        case DreamberdList():
-            if not isinstance(right, DreamberdList):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoList():
+            if not isinstance(right, GulfOfMexicoList):
+                return GulfOfMexicoBoolean(False)
             # Compare lexicographically
             for l_val, r_val in zip(left.values, right.values):
                 if is_really_equal(l_val, r_val).value:
                     continue
                 return is_less_than(l_val, r_val)
-            return DreamberdBoolean(len(left.values) < len(right.values))
+            return GulfOfMexicoBoolean(len(left.values) < len(right.values))
 
         case _:
             # For other types, not comparable
-            return DreamberdBoolean(False)
+            return GulfOfMexicoBoolean(False)
 
 
 def perform_two_value_operation(
-    left: DreamberdValue,
-    right: DreamberdValue,
+    left: GulfOfMexicoValue,
+    right: GulfOfMexicoValue,
     operator: OperatorType,
     operator_token: Token,
-) -> DreamberdValue:
+) -> GulfOfMexicoValue:
     match operator:
         case OperatorType.ADD:
-            if isinstance(left, DreamberdString) or isinstance(right, DreamberdString):
-                return DreamberdString(
+            if isinstance(left, GulfOfMexicoString) or isinstance(right, GulfOfMexicoString):
+                return GulfOfMexicoString(
                     db_to_string(left).value + db_to_string(right).value
                 )
             left_num = db_to_number(left)
             right_num = db_to_number(right)
-            return DreamberdNumber(left_num.value + right_num.value)
+            return GulfOfMexicoNumber(left_num.value + right_num.value)
         case OperatorType.SUB | OperatorType.MUL | OperatorType.DIV | OperatorType.EXP:
             left_num = db_to_number(left)
             right_num = db_to_number(right)
@@ -1031,7 +1031,7 @@ def perform_two_value_operation(
                 operator == OperatorType.DIV
                 and abs(right_num.value) < FLOAT_TO_INT_PREC
             ):  # pretty much zero
-                return DreamberdUndefined()
+                return GulfOfMexicoUndefined()
             elif (
                 operator == OperatorType.EXP
                 and left_num.value < -FLOAT_TO_INT_PREC
@@ -1052,7 +1052,7 @@ def perform_two_value_operation(
                     result = left_num.value / right_num.value
                 case OperatorType.EXP:
                     result = pow(left_num.value, right_num.value)
-            return DreamberdNumber(result)
+            return GulfOfMexicoNumber(result)
         case OperatorType.OR:
             left_bool = db_to_boolean(left)
             right_bool = db_to_boolean(right)
@@ -1107,8 +1107,8 @@ def perform_two_value_operation(
                 case (None, _) | (_, None):
                     is_le = None
             if operator == OperatorType.LE:
-                return DreamberdBoolean(is_le)
-            return db_not(DreamberdBoolean(is_le))
+                return GulfOfMexicoBoolean(is_le)
+            return db_not(GulfOfMexicoBoolean(is_le))
         case OperatorType.LT | OperatorType.GE:
             if operator == OperatorType.LT:
                 return is_less_than(left, right)
@@ -1119,11 +1119,11 @@ def perform_two_value_operation(
 
 def get_value_from_namespaces(
     name_or_value: Token, namespaces: list[Namespace]
-) -> DreamberdValue:
+) -> GulfOfMexicoValue:
 
     # what the frick am i doing rn
     if v := get_name_from_namespaces(name_or_value.value, namespaces):
-        if isinstance(v.value, DreamberdPromise):
+        if isinstance(v.value, GulfOfMexicoPromise):
             return deepcopy(
                 get_value_from_promise(v.value)
             )  # consider not deepcopying this but it doesnt really matter
@@ -1134,7 +1134,7 @@ def get_value_from_namespaces(
 def print_expression_debug(
     debug: int,
     expr: Union[list[Token], ExpressionTreeNode],
-    value: DreamberdValue,
+    value: GulfOfMexicoValue,
     namespaces: list[Namespace],
 ) -> None:
     expr = get_built_expression(expr)
@@ -1164,7 +1164,7 @@ def interpret_formatted_string(
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
-) -> DreamberdString:
+) -> GulfOfMexicoString:
     """Interpret a formatted string with ${} expressions."""
     string_value = string_token.value
     result = ""
@@ -1203,7 +1203,7 @@ def interpret_formatted_string(
         else:
             result += string_value[i]
             i += 1
-    return DreamberdString(result)
+    return GulfOfMexicoString(result)
 
 
 def evaluate_expression(
@@ -1213,7 +1213,7 @@ def evaluate_expression(
     when_statement_watchers: WhenStatementWatchers,
     *,
     ignore_string_escape_sequences: bool = False,
-) -> DreamberdValue:
+) -> GulfOfMexicoValue:
     """Wrapper for the evaluate_expression_for_real function that checks deleted values on each run."""
     retval = evaluate_expression_for_real(
         expr,
@@ -1223,7 +1223,7 @@ def evaluate_expression(
         ignore_string_escape_sequences,
     )
     if (
-        isinstance(retval, (DreamberdNumber, DreamberdString))
+        isinstance(retval, (GulfOfMexicoNumber, GulfOfMexicoString))
         and retval in deleted_values
     ):
         raise_error_at_line(
@@ -1232,8 +1232,8 @@ def evaluate_expression(
     return retval
 
 
-def evaluate_escape_sequences(string_value: DreamberdString) -> DreamberdString:
-    """Process escape sequences in a DreamberdString."""
+def evaluate_escape_sequences(string_value: GulfOfMexicoString) -> GulfOfMexicoString:
+    """Process escape sequences in a GulfOfMexicoString."""
     # Simple escape sequence processing
     escaped = string_value.value
     escaped = escaped.replace("\\n", "\n")
@@ -1242,7 +1242,7 @@ def evaluate_escape_sequences(string_value: DreamberdString) -> DreamberdString:
     escaped = escaped.replace('\\"', '"')
     escaped = escaped.replace("\\'", "'")
     escaped = escaped.replace("\\\\", "\\")
-    return DreamberdString(escaped)
+    return GulfOfMexicoString(escaped)
 
 
 def evaluate_expression_for_real(
@@ -1251,7 +1251,7 @@ def evaluate_expression_for_real(
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
     ignore_string_escape_sequences: bool,
-) -> DreamberdValue:
+) -> GulfOfMexicoValue:
 
     expr = get_built_expression(expr)
     match expr:
@@ -1268,7 +1268,7 @@ def evaluate_expression_for_real(
 
             # check the thing in the await symbol. if awaiting a single function that is async, evaluate it as not async
             force_execute_sync = False
-            if isinstance(func.value, DreamberdKeyword):
+            if isinstance(func.value, GulfOfMexicoKeyword):
                 if func.value.value == "await":
                     if len(expr.args) != 1:
                         raise_error_at_token(
@@ -1357,7 +1357,7 @@ def evaluate_expression_for_real(
                         )
                     # For next, we need to return a promise that will resolve to the future value
                     # Create a promise and register a watcher for the variable
-                    promise = DreamberdPromise(None)
+                    promise = GulfOfMexicoPromise(None)
 
                     # Get the namespace ID for the watcher key
                     _, ns = get_name_and_namespace_from_namespaces(
@@ -1393,7 +1393,7 @@ def evaluate_expression_for_real(
 
                     return promise
 
-            if not isinstance(func.value, (BuiltinFunction, DreamberdFunction)):
+            if not isinstance(func.value, (BuiltinFunction, GulfOfMexicoFunction)):
                 raise_error_at_token(
                     filename,
                     code,
@@ -1419,17 +1419,17 @@ def evaluate_expression_for_real(
                 )
                 for arg in expr.args
             ]
-            if isinstance(args[0], DreamberdSpecialBlankValue):
+            if isinstance(args[0], GulfOfMexicoSpecialBlankValue):
                 args = args[1:]
             if (
-                isinstance(func.value, DreamberdFunction)
+                isinstance(func.value, GulfOfMexicoFunction)
                 and func.value.is_async
                 and not force_execute_sync
             ):
                 register_async_function(
                     expr, func.value, namespaces, args, async_statements
                 )
-                return DreamberdUndefined()
+                return GulfOfMexicoUndefined()
             elif (
                 isinstance(func.value, BuiltinFunction) and func.value.modifies_caller
             ):  # special cases where the function itself modifies the caller
@@ -1472,7 +1472,7 @@ def evaluate_expression_for_real(
             )
 
         case ListNode():  # done :)
-            return DreamberdList(
+            return GulfOfMexicoList(
                 [
                     evaluate_expression(
                         x, namespaces, async_statements, when_statement_watchers
@@ -1501,7 +1501,7 @@ def evaluate_expression_for_real(
             index = evaluate_expression(
                 expr.index, namespaces, async_statements, when_statement_watchers
             )
-            if not isinstance(value, DreamberdIndexable):
+            if not isinstance(value, GulfOfMexicoIndexable):
                 raise_error_at_line(
                     filename,
                     code,
@@ -1535,7 +1535,7 @@ def evaluate_expression_for_real(
             )
             return perform_single_value_operation(val, expr.operator)
 
-    return DreamberdUndefined()
+    return GulfOfMexicoUndefined()
 
 
 def handle_next_expressions(
@@ -1571,7 +1571,7 @@ def handle_next_expressions(
             is_next = is_await = (
                 False  # i don't need this but it makes my LSP stop crying so it's here
             )
-            if isinstance(func.value, DreamberdKeyword) and (
+            if isinstance(func.value, GulfOfMexicoKeyword) and (
                 (is_next := func.value.value == "next")
                 or (is_await := func.value.value == "await")
             ):
@@ -1620,7 +1620,7 @@ def handle_next_expressions(
                         )
 
                     if (
-                        isinstance(func.value, DreamberdKeyword)
+                        isinstance(func.value, GulfOfMexicoKeyword)
                         and func.value.value == "next"
                     ):
                         if len(inner_expr.args) != 1 or not isinstance(
@@ -1780,7 +1780,7 @@ def determine_statement_type(
             val = get_name_from_namespaces(st.keyword.value, namespaces)
             if (
                 val is not None
-                and isinstance(val.value, DreamberdKeyword)
+                and isinstance(val.value, GulfOfMexicoKeyword)
                 and val.value.value in instance_to_keywords[type(st)]
             ):
                 return st
@@ -1790,7 +1790,7 @@ def determine_statement_type(
             val = get_name_from_namespaces(st.keyword.value, namespaces)
             if (
                 val
-                and isinstance(val.value, DreamberdKeyword)
+                and isinstance(val.value, GulfOfMexicoKeyword)
                 and val.value.value == "return"
             ):
                 return st
@@ -1801,7 +1801,7 @@ def determine_statement_type(
                 val = get_name_from_namespaces(st.keywords[0].value, namespaces)
                 if (
                     val
-                    and isinstance(val.value, DreamberdKeyword)
+                    and isinstance(val.value, GulfOfMexicoKeyword)
                     and re.match(r"^f?u?n?c?t?i?o?n?$", val.value.value)
                 ):
                     return st
@@ -1811,8 +1811,8 @@ def determine_statement_type(
                 if (
                     val
                     and other_val
-                    and isinstance(val.value, DreamberdKeyword)
-                    and isinstance(other_val.value, DreamberdKeyword)
+                    and isinstance(val.value, GulfOfMexicoKeyword)
+                    and isinstance(other_val.value, GulfOfMexicoKeyword)
                     and re.match(r"^f?u?n?c?t?i?o?n?$", other_val.value.value)
                     and val.value.value == "async"
                 ):
@@ -1824,7 +1824,7 @@ def determine_statement_type(
                 if (
                     (val := get_name_from_namespaces(st.modifiers[0].value, namespaces))
                     is not None
-                    and isinstance(val.value, DreamberdKeyword)
+                    and isinstance(val.value, GulfOfMexicoKeyword)
                     and val.value.value in {"const", "var"}
                 ):
                     return st
@@ -1833,7 +1833,7 @@ def determine_statement_type(
                     [
                         (val := get_name_from_namespaces(mod.value, namespaces))
                         is not None
-                        and isinstance(val.value, DreamberdKeyword)
+                        and isinstance(val.value, GulfOfMexicoKeyword)
                         and val.value.value in {"const", "var"}
                         for mod in st.modifiers
                     ]
@@ -1844,7 +1844,7 @@ def determine_statement_type(
                     [
                         (val := get_name_from_namespaces(mod.value, namespaces))
                         is not None
-                        and isinstance(val.value, DreamberdKeyword)
+                        and isinstance(val.value, GulfOfMexicoKeyword)
                         and val.value.value == "const"
                         for mod in st.modifiers
                     ]
@@ -1854,12 +1854,12 @@ def determine_statement_type(
             if (
                 isinstance(
                     v := get_value_from_namespaces(st.to_keyword, namespaces),
-                    DreamberdKeyword,
+                    GulfOfMexicoKeyword,
                 )
                 and v.value == "to"
                 and isinstance(
                     v := get_value_from_namespaces(st.export_keyword, namespaces),
-                    DreamberdKeyword,
+                    GulfOfMexicoKeyword,
                 )
                 and v.value == "export"
             ):
@@ -1879,7 +1879,7 @@ def adjust_for_normal_nexts(
     statement: CodeStatementWithExpression,
     async_nexts: set[str],
     normal_nexts: set[tuple[str, int]],
-    promise: Optional[DreamberdPromise],
+    promise: Optional[GulfOfMexicoPromise],
     namespaces: list[Namespace],
     prev_namespace: Namespace,
 ):
@@ -1999,7 +1999,7 @@ def wait_for_async_nexts(
 def interpret_name_watching_statement(
     statement: CodeStatementWithExpression,
     namespaces: list[Namespace],
-    promise: Optional[DreamberdPromise],
+    promise: Optional[GulfOfMexicoPromise],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
 ):
@@ -2070,11 +2070,11 @@ def clear_temp_namespace(
 
 # simply execute the conditional inside a new scope
 def execute_conditional(
-    condition: DreamberdValue,
+    condition: GulfOfMexicoValue,
     statements_inside_scope: list[tuple[CodeStatement, ...]],
     namespaces: list[Namespace],
     when_statement_watchers: WhenStatementWatchers,
-) -> Optional[DreamberdValue]:
+) -> Optional[GulfOfMexicoValue]:
     condition = db_to_boolean(condition)
     execute = (
         condition.value == True
@@ -2093,32 +2093,32 @@ def execute_conditional(
 # this is the equaivalent of an event listener
 def get_mouse_event_object(
     x: int, y: int, button: mouse.Button, event: str
-) -> DreamberdObject:
-    return DreamberdObject(
+) -> GulfOfMexicoObject:
+    return GulfOfMexicoObject(
         "MouseEvent",
         {
-            "x": Name("x", DreamberdNumber(x)),
-            "y": Name("y", DreamberdNumber(y)),
-            "button": Name("button", DreamberdString(str(button).split(".")[-1])),
-            "event": Name("event", DreamberdString(event)),
+            "x": Name("x", GulfOfMexicoNumber(x)),
+            "y": Name("y", GulfOfMexicoNumber(y)),
+            "button": Name("button", GulfOfMexicoString(str(button).split(".")[-1])),
+            "event": Name("event", GulfOfMexicoString(event)),
         },
     )
 
 
 def get_keyboard_event_object(
     key: Optional[Union[keyboard.Key, keyboard.KeyCode]], event: str
-) -> DreamberdObject:
-    return DreamberdObject(
+) -> GulfOfMexicoObject:
+    return GulfOfMexicoObject(
         "MouseEvent",
         {
-            "key": Name("key", DreamberdString(str(key).split(".")[-1])),
-            "event": Name("event", DreamberdString(event)),
+            "key": Name("key", GulfOfMexicoString(str(key).split(".")[-1])),
+            "event": Name("event", GulfOfMexicoString(event)),
         },
     )
 
 
 def execute_after_statement(
-    event: DreamberdValue,
+    event: GulfOfMexicoValue,
     statements_inside_scope: list[tuple[CodeStatement, ...]],
     namespaces: list[Namespace],
     when_statement_watchers: WhenStatementWatchers,
@@ -2132,7 +2132,7 @@ def execute_after_statement(
             "Attempted to use mouse and keyboard functionality without importing the [input] extra dependency.",
         )
 
-    if not isinstance(event, DreamberdString):
+    if not isinstance(event, GulfOfMexicoString):
         raise_error_at_line(
             filename,
             code,
@@ -2326,7 +2326,7 @@ def register_when_statement(
             id(v.value)
             for name in gathered_names
             if (v := get_name_from_namespaces(name.value, namespaces)) is not None
-            and isinstance(v.value, DreamberdMutable)
+            and isinstance(v.value, GulfOfMexicoMutable)
         ]
         + [
             id(v)
@@ -2337,7 +2337,7 @@ def register_when_statement(
             id(v.value)
             for name in caller_names
             if (v := get_name_from_namespaces(name, namespaces)) is not None
-            and isinstance(v.value, DreamberdMutable)
+            and isinstance(v.value, GulfOfMexicoMutable)
         ]
     )
     # the last comprehension watches callers of things (like list in list.length), and requires some implementation in the evaluate_expression function
@@ -2365,8 +2365,8 @@ def load_globals(
     code: str,
     arg3,
     arg4,
-    exported_names: list[tuple[str, str, DreamberdValue]],
-    importable_names: dict[str, DreamberdValue],
+    exported_names: list[tuple[str, str, GulfOfMexicoValue]],
+    importable_names: dict[str, GulfOfMexicoValue],
 ) -> None:
     """Stub function for loading globals - currently does nothing."""
     pass
@@ -2392,11 +2392,11 @@ def get_name_and_namespace_from_namespaces(
     return None, None
 
 
-def determine_non_name_value(name_or_value: Token) -> DreamberdValue:
+def determine_non_name_value(name_or_value: Token) -> GulfOfMexicoValue:
     """Determine the value of a token that is not a name in the namespace."""
     match name_or_value.type:
         case TokenType.STRING:
-            return DreamberdString(name_or_value.value)
+            return GulfOfMexicoString(name_or_value.value)
         case TokenType.NAME:
             # Try to parse as number
             try:
@@ -2405,22 +2405,22 @@ def determine_non_name_value(name_or_value: Token) -> DreamberdValue:
                     "." not in name_or_value.value
                     and "e" not in name_or_value.value.lower()
                 ):
-                    return DreamberdNumber(int(name_or_value.value))
+                    return GulfOfMexicoNumber(int(name_or_value.value))
                 else:
-                    return DreamberdNumber(float(name_or_value.value))
+                    return GulfOfMexicoNumber(float(name_or_value.value))
             except ValueError:
                 # Not a number, check if it's a keyword or undefined
                 if name_or_value.value in ["true", "false", "maybe", "undefined"]:
                     # These should be in KEYWORDS, but if not found, handle here
                     match name_or_value.value:
                         case "true":
-                            return DreamberdBoolean(True)
+                            return GulfOfMexicoBoolean(True)
                         case "false":
-                            return DreamberdBoolean(False)
+                            return GulfOfMexicoBoolean(False)
                         case "maybe":
-                            return DreamberdBoolean(None)
+                            return GulfOfMexicoBoolean(None)
                         case "undefined":
-                            return DreamberdUndefined()
+                            return GulfOfMexicoUndefined()
                 # If it's not a recognized literal, it's an undefined name
                 raise_error_at_token(
                     filename,
@@ -2445,7 +2445,7 @@ code: str = ""
 current_line: int = 0
 
 # Set of deleted values
-deleted_values: set[DreamberdValue] = set()
+deleted_values: set[GulfOfMexicoValue] = set()
 
 # Global watchers for reactive programming
 name_watchers: NameWatchers = {}
@@ -2467,7 +2467,7 @@ def interpret_code_statements_main_wrapper(
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
-) -> Optional[DreamberdValue]:
+) -> Optional[GulfOfMexicoValue]:
     """Main wrapper for interpreting code statements."""
     return interpret_code_statements(
         statements, namespaces, async_statements, when_statement_watchers
@@ -2479,7 +2479,7 @@ def interpret_code_statements(
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
-) -> Optional[DreamberdValue]:
+) -> Optional[GulfOfMexicoValue]:
     """Interpret a list of code statements."""
     result = None
 
@@ -2604,7 +2604,7 @@ def interpret_code_statements(
 
             case FunctionDefinition():
                 # Create the function object
-                func = DreamberdFunction(
+                func = GulfOfMexicoFunction(
                     [arg.value for arg in statement.args],
                     statement.code,
                     statement.is_async,
@@ -2618,7 +2618,7 @@ def interpret_code_statements(
 
             case ClassDeclaration():
                 # Create a class object (simplified for now)
-                class_obj = DreamberdObject(statement.name.value, {})
+                class_obj = GulfOfMexicoObject(statement.name.value, {})
                 # Execute the class body in a new scope
                 class_namespace = {
                     statement.name.value: Name(statement.name.value, class_obj)
@@ -2680,29 +2680,29 @@ def interpret_code_statements(
     return result
 
 
-def is_approx_equal(left: DreamberdValue, right: DreamberdValue) -> DreamberdBoolean:
+def is_approx_equal(left: GulfOfMexicoValue, right: GulfOfMexicoValue) -> GulfOfMexicoBoolean:
     """Approximate equality with fuzzy matching based on ratios."""
     if type(left) != type(right):
-        return DreamberdBoolean(False)
+        return GulfOfMexicoBoolean(False)
 
     match left:
-        case DreamberdNumber():
-            if not isinstance(right, DreamberdNumber):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoNumber():
+            if not isinstance(right, GulfOfMexicoNumber):
+                return GulfOfMexicoBoolean(False)
             if left.value == right.value:
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             if (
                 abs(left.value) < FLOAT_TO_INT_PREC
                 and abs(right.value) < FLOAT_TO_INT_PREC
             ):
-                return DreamberdBoolean(True)
+                return GulfOfMexicoBoolean(True)
             ratio = abs(left.value - right.value) / max(
                 abs(left.value), abs(right.value)
             )
-            return DreamberdBoolean(ratio <= NUM_EQUALITY_RATIO)
+            return GulfOfMexicoBoolean(ratio <= NUM_EQUALITY_RATIO)
 
-        case DreamberdString():
-            if not isinstance(right, DreamberdString):
-                return DreamberdBoolean(False)
+        case GulfOfMexicoString():
+            if not isinstance(right, GulfOfMexicoString):
+                return GulfOfMexicoBoolean(False)
             if left.value == right.value:
                 return Dreamber

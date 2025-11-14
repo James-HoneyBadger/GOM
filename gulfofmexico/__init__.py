@@ -3,12 +3,12 @@ import sys
 from time import sleep
 from typing import Optional, Union
 
-from dreamberd.builtin import KEYWORDS, Name, DreamberdValue, Variable
-from dreamberd.processor.lexer import tokenize
-from dreamberd.processor.syntax_tree import generate_syntax_tree
-from dreamberd.interpreter import (
+from gulfofmexico.builtin import KEYWORDS, Name, GulfOfMexicoValue, Variable
+from gulfofmexico.processor.lexer import tokenize
+from gulfofmexico.processor.syntax_tree import generate_syntax_tree
+from gulfofmexico.interpreter import (
     interpret_code_statements_main_wrapper,
-    load_global_dreamberd_variables,
+    load_global_gulfofmexico_variables,
     load_globals,
     load_public_global_variables,
 )
@@ -38,11 +38,11 @@ def run_file(main_filename: str) -> None:  # idk what else to call this
         files = [(None, "".join(code_lines))]
 
     # execute code for each file
-    importable_names: dict[str, dict[str, DreamberdValue]] = {}
+    importable_names: dict[str, dict[str, GulfOfMexicoValue]] = {}
     for filename, code in files:
         filename = filename or "__unnamed_file__"
         # Set global variables for interpreter
-        import dreamberd.interpreter as interpreter
+        import gulfofmexico.interpreter as interpreter
 
         interpreter.filename = filename
         interpreter.code = code
@@ -52,7 +52,7 @@ def run_file(main_filename: str) -> None:  # idk what else to call this
         # load variables and run the code
         # Use Name objects directly for keywords
         namespaces: list[dict[str, Union[Variable, Name]]] = [KEYWORDS.copy()]  # type: ignore
-        exported_names: list[tuple[str, str, DreamberdValue]] = []
+        exported_names: list[tuple[str, str, GulfOfMexicoValue]] = []
         load_globals(
             filename,
             code,
@@ -61,7 +61,7 @@ def run_file(main_filename: str) -> None:  # idk what else to call this
             exported_names,
             importable_names.get(filename, {}),
         )
-        load_global_dreamberd_variables(namespaces)
+        load_global_gulfofmexico_variables(namespaces)
         load_public_global_variables(namespaces)
         interpret_code_statements_main_wrapper(statements, namespaces, [], [{}])
 

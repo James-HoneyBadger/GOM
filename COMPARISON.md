@@ -4,14 +4,14 @@
 
 | Python | Rust | Status | Notes |
 |--------|------|--------|-------|
-| `dreamberd/__init__.py` | `src/main.rs` | ✅ Complete | CLI, REPL, file runner |
-| `dreamberd/base.py` | `src/base.rs` | ✅ Complete | Tokens, errors, operators |
-| `dreamberd/builtin.py` | `src/builtin.rs` | ✅ Complete | Value types, conversions |
-| `dreamberd/interpreter.py` | `src/interpreter.rs` | 🟡 Stub | Needs full execution logic |
-| `dreamberd/serialize.py` | `src/serialize.rs` | ✅ Complete | JSON serialization |
-| `dreamberd/processor/lexer.py` | `src/processor/lexer.rs` | ✅ Complete | Tokenization |
-| `dreamberd/processor/syntax_tree.py` | `src/processor/syntax_tree.rs` | 🟡 Partial | Types done, parser stub |
-| `dreamberd/processor/expression_tree.py` | `src/processor/expression_tree.rs` | 🟡 Partial | Types done, builder stub |
+| `GulfOfMexico/__init__.py` | `src/main.rs` | ✅ Complete | CLI, REPL, file runner |
+| `GulfOfMexico/base.py` | `src/base.rs` | ✅ Complete | Tokens, errors, operators |
+| `GulfOfMexico/builtin.py` | `src/builtin.rs` | ✅ Complete | Value types, conversions |
+| `GulfOfMexico/interpreter.py` | `src/interpreter.rs` | 🟡 Stub | Needs full execution logic |
+| `GulfOfMexico/serialize.py` | `src/serialize.rs` | ✅ Complete | JSON serialization |
+| `GulfOfMexico/processor/lexer.py` | `src/processor/lexer.rs` | ✅ Complete | Tokenization |
+| `GulfOfMexico/processor/syntax_tree.py` | `src/processor/syntax_tree.rs` | 🟡 Partial | Types done, parser stub |
+| `GulfOfMexico/processor/expression_tree.py` | `src/processor/expression_tree.rs` | 🟡 Partial | Types done, builder stub |
 | `pyproject.toml` | `Cargo.toml` | ✅ Complete | Dependencies configured |
 | `README.md` | `README-RUST.md` | ✅ Complete | Documentation |
 
@@ -189,7 +189,7 @@ pub fn raise_error_at_token(
 
 ```toml
 [tool.poetry]
-name = "dreamberd"
+name = "GulfOfMexico"
 version = "0.1.1"
 description = "An interpreter for the perfect programming language"
 
@@ -199,14 +199,14 @@ pynput = "1.7.6"
 pygithub = "2.2.0"
 
 [tool.poetry.scripts]
-dreamberd = "dreamberd:main"
+GulfOfMexico = "GulfOfMexico:main"
 ```
 
 ### Rust (Cargo)
 
 ```toml
 [package]
-name = "dreamberd"
+name = "GulfOfMexico"
 version = "0.2.0"
 edition = "2021"
 
@@ -228,11 +228,11 @@ globals = ["reqwest", "octocrab"]
 
 ```bash
 # Requires Python runtime
-pip install dreamberd
+pip install GulfOfMexico
 
 # Or from source
 poetry install
-poetry run dreamberd
+poetry run GulfOfMexico
 ```
 
 ### Rust
@@ -240,11 +240,11 @@ poetry run dreamberd
 ```bash
 # Single binary, no runtime needed
 cargo build --release
-./target/release/dreamberd
+./target/release/GulfOfMexico
 
 # Or install
 cargo install --path .
-dreamberd
+GulfOfMexico
 ```
 
 ## Advantages of Rust Version
