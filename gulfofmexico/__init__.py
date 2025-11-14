@@ -63,7 +63,9 @@ def run_file(main_filename: str) -> None:  # idk what else to call this
         )
         load_global_gulfofmexico_variables(namespaces)
         load_public_global_variables(namespaces)
-        interpret_code_statements_main_wrapper(statements, namespaces, [], [{}])
+        interpret_code_statements_main_wrapper(
+            statements, namespaces, [], [{}], importable_names, exported_names
+        )
 
         # take exported names and put them where they belong
         for target_filename, name, value in exported_names:

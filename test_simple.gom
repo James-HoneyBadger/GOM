@@ -1,2 +1,5 @@
-var x = 5!
-print x!
+
+fn test(y) => {
+   print y!
+}
+test(42)!

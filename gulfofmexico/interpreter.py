@@ -208,7 +208,12 @@ def evaluate_normal_function(
     }
     return (
         interpret_code_statements(
-            func.code, namespaces + [new_namespace], [], when_statement_watchers + [{}]
+            func.code,
+            namespaces + [new_namespace],
+            [],
+            when_statement_watchers + [{}],
+            {},
+            [],
         )
         or GulfOfMexicoUndefined()
     )
@@ -564,7 +569,12 @@ def declare_new_variable(
                 when_statement_watchers[-1][id(value)] = []
             when_statement_watchers[-1][id(value)].append(when_watcher)
         execute_conditional(
-            condition_val, inside_statements, namespaces, when_statement_watchers
+            condition_val,
+            inside_statements,
+            namespaces,
+            when_statement_watchers,
+            {},
+            [],
         )
 
 
@@ -671,6 +681,8 @@ def assign_variable(
                     inside_statements,
                     namespaces,
                     when_statement_watchers,
+                    {},
+                    [],
                 )
                 visited_whens.append(when_watcher)
 
@@ -724,7 +736,7 @@ def assign_variable(
 
     # check if this name appears in a when statement of the appropriate scope  --  it would have to be watching the name
     if when_watchers := get_code_from_when_statement_watchers(
-        name, when_statement_watchers
+        id(var), when_statement_watchers
     ):
         for when_watcher in when_watchers:  # i just wanna be done with this :(
             condition, inside_statements = when_watcher
@@ -732,9 +744,12 @@ def assign_variable(
                 condition, namespaces, async_statements, when_statement_watchers
             )
             if isinstance(new_value, GulfOfMexicoMutable):
-                when_statement_watchers[-1][id(new_value)].append(
-                    when_watcher
-                )  ##### remember : this is tuple so it is immutable and copied !!!!!!!!!!!!!!!!!!!!!!  # wait nvm i suick at pytghon
+                if id(new_value) not in when_statement_watchers[-1]:
+                    when_statement_watchers[-1][id(new_value)] = []
+                if when_watcher not in when_statement_watchers[-1][id(new_value)]:
+                    when_statement_watchers[-1][id(new_value)].append(
+                        when_watcher
+                    )  ##### remember : this is tuple so it is immutable and copied !!!!!!!!!!!!!!!!!!!!!!  # wait nvm i suick at pytghon
             if isinstance(
                 var.prev_values[-1], GulfOfMexicoMutable
             ):  # if prev value was being observed under this statement, remove it  ??
@@ -743,15 +758,21 @@ def assign_variable(
                     when_watcher,
                     when_statement_watchers,
                 )
-            when_statement_watchers[-1][id(var)].append(
-                when_watcher
-            )  # put this where the new variable is
+            if id(var) not in when_statement_watchers[-1]:
+                when_statement_watchers[-1][id(var)] = []
+            if when_watcher not in when_statement_watchers[-1][id(var)]:
+                when_statement_watchers[-1][id(var)].append(
+                    when_watcher
+                )  # put this where the new variable is
             execute_conditional(
-                condition_val, inside_statements, namespaces, when_statement_watchers
+                condition_val,
+                inside_statements,
+                namespaces,
+                when_statement_watchers,
+                {},
+                [],
             )
-        remove_from_all_when_statement_watchers(
-            name, when_statement_watchers
-        )  # that name is now set to a variable, discard it from the when statement  --  it is now a var not a string
+        # Removed: remove_from_all_when_statement_watchers(id(var), when_statement_watchers)
 
     if is_global:
         # Always save locally first
@@ -1137,7 +1158,7 @@ def get_value_from_namespaces(
     if v := get_name_from_namespaces(name_or_value.value, namespaces):
         if isinstance(v.value, GulfOfMexicoPromise):
             return deepcopy(
-                get_value_from_promise(v.value)
+                v.value.value
             )  # consider not deepcopying this but it doesnt really matter
         return v.value
     return determine_non_name_value(name_or_value)
@@ -1388,6 +1409,7 @@ def evaluate_expression_for_real(
                     # Create a dummy return statement that will resolve the promise
                     # This is a bit of a hack, but it works with the existing watcher system
                     dummy_return = ReturnStatement(
+                        keyword=None,
                         expression=[
                             expr.args[0].name_or_value
                         ],  # Just return the variable value
@@ -1476,6 +1498,8 @@ def evaluate_expression_for_real(
                         inside_statements,
                         namespaces,
                         when_statement_watchers,
+                        {},
+                        [],
                     )
                 return retval
 
@@ -2058,7 +2082,7 @@ def interpret_name_watching_statement(
             )
         case Conditional():
             execute_conditional(
-                expr_val, statement.code, namespaces, when_statement_watchers
+                expr_val, statement.code, namespaces, when_statement_watchers, {}, []
             )
         case AfterStatement():
             execute_after_statement(
@@ -2086,6 +2110,8 @@ def execute_conditional(
     statements_inside_scope: list[tuple[CodeStatement, ...]],
     namespaces: list[Namespace],
     when_statement_watchers: WhenStatementWatchers,
+    importable_names: dict[str, dict[str, GulfOfMexicoValue]],
+    exported_names: list[tuple[str, str, GulfOfMexicoValue]],
 ) -> Optional[GulfOfMexicoValue]:
     condition = db_to_boolean(condition)
     execute = (
@@ -2099,6 +2125,8 @@ def execute_conditional(
             namespaces + [{}],
             [],
             when_statement_watchers + [{}],
+            importable_names,
+            exported_names,
         )  # empty scope and async statements, just for this :)
 
 
@@ -2134,6 +2162,8 @@ def execute_after_statement(
     statements_inside_scope: list[tuple[CodeStatement, ...]],
     namespaces: list[Namespace],
     when_statement_watchers: WhenStatementWatchers,
+    importable_names: dict[str, dict[str, GulfOfMexicoValue]],
+    exported_names: list[tuple[str, str, GulfOfMexicoValue]],
 ) -> None:
 
     if not KEY_MOUSE_IMPORTED:
@@ -2179,6 +2209,8 @@ def execute_after_statement(
                             ],
                             [],
                             when_statement_watchers + [{}],
+                            importable_names,
+                            exported_names,
                         )
                     del mouse_buttons[button]
 
@@ -2202,6 +2234,8 @@ def execute_after_statement(
                         ],
                         [],
                         when_statement_watchers + [{}],
+                        importable_names,
+                        exported_names,
                     )
 
             listener = mouse.Listener(on_click=listener_func)  # type: ignore
@@ -2224,6 +2258,8 @@ def execute_after_statement(
                         ],
                         [],
                         when_statement_watchers + [{}],
+                        importable_names,
+                        exported_names,
                     )
 
             listener = mouse.Listener(on_click=listener_func)  # type: ignore
@@ -2239,7 +2275,7 @@ def execute_after_statement(
                 nonlocal namespaces, statements_inside_scope
                 if key in keys:
                     event_object = get_keyboard_event_object(key.char if isinstance(key, keyboard.KeyCode) else key, event.value)  # type: ignore
-                    interpret_code_statements(statements_inside_scope, namespaces + [{"event": Name("event", event_object)}], [], when_statement_watchers + [{}])  # type: ignore
+                    interpret_code_statements(statements_inside_scope, namespaces + [{"event": Name("event", event_object)}], [], when_statement_watchers + [{}], importable_names, exported_names)  # type: ignore
                 keys.discard(key)
 
             listener = keyboard.Listener(on_press=on_press, on_release=on_release)  # type: ignore
@@ -2254,6 +2290,8 @@ def execute_after_statement(
                     namespaces + [{"event": Name("event", event_object)}],
                     [],
                     when_statement_watchers + [{}],
+                    importable_names,
+                    exported_names,
                 )
 
             listener = keyboard.Listener(on_press=on_press)  # type: ignore
@@ -2268,6 +2306,8 @@ def execute_after_statement(
                     namespaces + [{"event": Name("event", event_object)}],
                     [],
                     when_statement_watchers + [{}],
+                    importable_names,
+                    exported_names,
                 )
 
             listener = keyboard.Listener(on_release=on_release)  # type: ignore
@@ -2314,6 +2354,8 @@ def register_when_statement(
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
+    importable_names: dict[str, dict[str, GulfOfMexicoValue]],
+    exported_names: list[tuple[str, str, GulfOfMexicoValue]],
 ):
 
     # if it is a variable, store it as the address to that variable.
@@ -2368,7 +2410,12 @@ def register_when_statement(
         built_condition, namespaces, async_statements, when_statement_watchers
     )
     execute_conditional(
-        condition_value, statements_inside_scope, namespaces, when_statement_watchers
+        condition_value,
+        statements_inside_scope,
+        namespaces,
+        when_statement_watchers,
+        importable_names,
+        exported_names,
     )
 
 
@@ -2479,10 +2526,17 @@ def interpret_code_statements_main_wrapper(
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
+    importable_names: dict[str, dict[str, GulfOfMexicoValue]],
+    exported_names: list[tuple[str, str, GulfOfMexicoValue]],
 ) -> Optional[GulfOfMexicoValue]:
     """Main wrapper for interpreting code statements."""
     return interpret_code_statements(
-        statements, namespaces, async_statements, when_statement_watchers
+        statements,
+        namespaces,
+        async_statements,
+        when_statement_watchers,
+        importable_names,
+        exported_names,
     )
 
 
@@ -2491,6 +2545,8 @@ def interpret_code_statements(
     namespaces: list[Namespace],
     async_statements: AsyncStatements,
     when_statement_watchers: WhenStatementWatchers,
+    importable_names: dict[str, dict[str, GulfOfMexicoValue]],
+    exported_names: list[tuple[str, str, GulfOfMexicoValue]],
 ) -> Optional[GulfOfMexicoValue]:
     """Interpret a list of code statements."""
     result = None
@@ -2589,6 +2645,8 @@ def interpret_code_statements(
                     statement.code,
                     namespaces,
                     when_statement_watchers,
+                    importable_names,
+                    exported_names,
                 )
 
             case WhenStatement():
@@ -2598,6 +2656,8 @@ def interpret_code_statements(
                     namespaces,
                     async_statements,
                     when_statement_watchers,
+                    importable_names,
+                    exported_names,
                 )
 
             case AfterStatement():
@@ -2612,6 +2672,8 @@ def interpret_code_statements(
                     statement.code,
                     namespaces,
                     when_statement_watchers,
+                    importable_names,
+                    exported_names,
                 )
 
             case FunctionDefinition():
@@ -2640,6 +2702,8 @@ def interpret_code_statements(
                     namespaces + [class_namespace],
                     async_statements,
                     when_statement_watchers + [{}],
+                    importable_names,
+                    exported_names,
                 )
                 # Add the class to the namespace
                 namespaces[-1][statement.name.value] = Name(
@@ -2661,12 +2725,36 @@ def interpret_code_statements(
                 pass
 
             case ImportStatement():
-                # Import handling - simplified
-                pass
+                for name_token in statement.names:
+                    name = name_token.value
+                    found = False
+                    for file_dict in importable_names.values():
+                        if name in file_dict:
+                            namespaces[-1][name] = Name(name, file_dict[name])
+                            found = True
+                            break
+                    if not found:
+                        raise_error_at_token(
+                            filename,
+                            code,
+                            f"Cannot find imported name: {name}",
+                            name_token,
+                        )
 
             case ExportStatement():
-                # Export handling - simplified
-                pass
+                for name_token in statement.names:
+                    name = name_token.value
+                    v = get_name_from_namespaces(name, namespaces)
+                    if v is None:
+                        raise_error_at_token(
+                            filename,
+                            code,
+                            f"Cannot export undefined name: {name}",
+                            name_token,
+                        )
+                    value = v.value if isinstance(v, Name) else v.value
+                    target = statement.target_file.value
+                    exported_names.append((target, name, value))
 
     # Process async statements
     while async_statements:
@@ -2680,6 +2768,8 @@ def interpret_code_statements(
                 async_namespaces,
                 async_statements,
                 when_statement_watchers,
+                importable_names,
+                exported_names,
             )
 
             # Update index for next execution
@@ -2690,33 +2780,3 @@ def interpret_code_statements(
                 )
 
     return result
-
-
-def is_approx_equal(
-    left: GulfOfMexicoValue, right: GulfOfMexicoValue
-) -> GulfOfMexicoBoolean:
-    """Approximate equality with fuzzy matching based on ratios."""
-    if type(left) != type(right):
-        return GulfOfMexicoBoolean(False)
-
-    match left:
-        case GulfOfMexicoNumber():
-            if not isinstance(right, GulfOfMexicoNumber):
-                return GulfOfMexicoBoolean(False)
-            if left.value == right.value:
-                return GulfOfMexicoBoolean(True)
-            if (
-                abs(left.value) < FLOAT_TO_INT_PREC
-                and abs(right.value) < FLOAT_TO_INT_PREC
-            ):
-                return GulfOfMexicoBoolean(True)
-            ratio = abs(left.value - right.value) / max(
-                abs(left.value), abs(right.value)
-            )
-            return GulfOfMexicoBoolean(ratio <= NUM_EQUALITY_RATIO)
-
-        case GulfOfMexicoString():
-            if not isinstance(right, GulfOfMexicoString):
-                return GulfOfMexicoBoolean(False)
-            if left.value == right.value:
-                return Dreamber

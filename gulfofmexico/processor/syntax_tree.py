@@ -359,27 +359,13 @@ def create_function_definition(
     statements_inside_scope: list[tuple[CodeStatement, ...]],
 ) -> tuple[CodeStatement, ...]:
 
-    # parse this more to make sure it really really really can be a function
-    names_in_row: list[Token] = []
-    other_names: list[Token] = []
-    looking_for_in_row = True
-    for t in without_whitespace:
-        if t.type == TokenType.FUNC_POINT:
-            break
-        if looking_for_in_row:
-            if t.type != TokenType.NAME:
-                looking_for_in_row = False
-            elif t.value:
-                names_in_row.append(t)
-        else:
-            if t.type == TokenType.NAME and t.value != "":
-                other_names.append(t)
-            elif t.type != TokenType.COMMA:
-                raise_error_at_token(
-                    filename, code, "Invalid token in function declaration.", t
-                )
+    # Parse function declaration
+    names_in_row = []
+    i = 0
+    while i < len(without_whitespace) and without_whitespace[i].type == TokenType.NAME:
+        names_in_row.append(without_whitespace[i])
+        i += 1
 
-    # too many or too little keywords for the function
     if not 2 <= len(names_in_row) <= 4:
         raise_error_at_token(
             filename,
@@ -388,49 +374,26 @@ def create_function_definition(
             without_whitespace[0],
         )
 
-    is_async = len(names_in_row) == 4
-    can_be_async = len(names_in_row) == 3 and not other_names
-    if not is_async and can_be_async:  # can be one of two forms:
-
-        return FunctionDefinition(  # func name(arg))
-            keywords=names_in_row[:1],
-            name=names_in_row[1],
-            args=names_in_row[2:],
-            code=statements_inside_scope,
-            is_async=False,
-        ), FunctionDefinition(  # async func name()
-            keywords=names_in_row[:2],
-            name=names_in_row[2],
-            args=[],
-            code=statements_inside_scope,
-            is_async=True,
-        )
-
-    elif is_async:
-
-        # async func name (arg, arg, arg) ...
-        return (
-            FunctionDefinition(
-                keywords=names_in_row[:2],
-                name=names_in_row[2],
-                args=names_in_row[3:] + other_names,
-                code=statements_inside_scope,
-                is_async=True,
-            ),
-        )
-
+    # Check if async
+    is_async = len(names_in_row) >= 2 and names_in_row[0].value == "async"
+    if is_async:
+        keywords = names_in_row[:2]
+        name = names_in_row[2]
+        args = names_in_row[3:]
     else:
+        keywords = names_in_row[:1]
+        name = names_in_row[1]
+        args = names_in_row[2:]
 
-        # func name (arg, arg, arg)
-        return (
-            FunctionDefinition(
-                keywords=names_in_row[:1],
-                name=names_in_row[1],
-                args=names_in_row[2:] + other_names,
-                code=statements_inside_scope,
-                is_async=False,
-            ),
-        )
+    return (
+        FunctionDefinition(
+            keywords=keywords,
+            name=name,
+            args=args,
+            code=statements_inside_scope,
+            is_async=is_async,
+        ),
+    )
 
 
 def create_scoped_code_statement(
@@ -481,12 +444,32 @@ def create_scoped_code_statement(
         and without_whitespace[2].type == TokenType.L_CURLY
     )
 
+    # check for function block
+    can_be_function_block = (
+        len(without_whitespace) >= 2
+        and without_whitespace[0].type == TokenType.NAME
+        and without_whitespace[1].type == TokenType.NAME
+        and (
+            (without_whitespace[0].value == "function")
+            or (
+                len(without_whitespace) >= 3
+                and without_whitespace[0].value == "async"
+                and without_whitespace[1].value == "function"
+            )
+        )
+    )
+
     # finally finally, check for the after or when statement -- this will have identical syntax to the conditional so there
     # is no point in doing anything extra special
 
     # this dude is seperated to another function because the same code is reused in () => ... functions (no scope)
     possibilities = []
     if can_be_function:
+        return create_function_definition(
+            filename, without_whitespace, code, statements_inside_scope
+        )
+
+    if can_be_function_block:
         return create_function_definition(
             filename, without_whitespace, code, statements_inside_scope
         )
