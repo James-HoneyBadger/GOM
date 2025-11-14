@@ -92,9 +92,7 @@ class GomRepl:
                 interpreter.filename = REPL_FILENAME
                 interpreter.code = candidate
                 tokens = tokenize(interpreter.filename, candidate)
-                _ = generate_syntax_tree(
-                    interpreter.filename, tokens, candidate
-                )
+                _ = generate_syntax_tree(interpreter.filename, tokens, candidate)
                 # If parse succeeds, return buffer
                 return candidate
             except InterpretationError as e:
