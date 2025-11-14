@@ -672,14 +672,17 @@ def assign_variable(
             for when_watcher in when_watchers:  # i just wanna be done with this :(
                 if any([when_watcher == x for x in visited_whens]):
                     continue
-                condition, inside_statements = when_watcher
+                (condition, inside_statements, captured_namespaces) = when_watcher
                 condition_val = evaluate_expression(
-                    condition, namespaces, async_statements, when_statement_watchers
+                    condition,
+                    captured_namespaces,
+                    async_statements,
+                    when_statement_watchers,
                 )
                 execute_conditional(
                     condition_val,
                     inside_statements,
-                    namespaces,
+                    captured_namespaces,
                     when_statement_watchers,
                     {},
                     [],
@@ -739,9 +742,16 @@ def assign_variable(
         id(var), when_statement_watchers
     ):
         for when_watcher in when_watchers:  # i just wanna be done with this :(
-            condition, inside_statements = when_watcher
+            if len(when_watcher) == 3:
+                condition, inside_statements, captured_namespaces = when_watcher
+            else:
+                condition, inside_statements = when_watcher
+                captured_namespaces = namespaces
             condition_val = evaluate_expression(
-                condition, namespaces, async_statements, when_statement_watchers
+                condition,
+                captured_namespaces,
+                async_statements,
+                when_statement_watchers,
             )
             if isinstance(new_value, GulfOfMexicoMutable):
                 if id(new_value) not in when_statement_watchers[-1]:
@@ -749,10 +759,10 @@ def assign_variable(
                 if when_watcher not in when_statement_watchers[-1][id(new_value)]:
                     when_statement_watchers[-1][id(new_value)].append(
                         when_watcher
-                    )  ##### remember : this is tuple so it is immutable and copied !!!!!!!!!!!!!!!!!!!!!!  # wait nvm i suick at pytghon
+                    )  # remember: this is tuple so it is immutable and copied!
             if isinstance(
                 var.prev_values[-1], GulfOfMexicoMutable
-            ):  # if prev value was being observed under this statement, remove it  ??
+            ):  # if prev value was being observed under this statement, remove it
                 remove_from_when_statement_watchers(
                     id(var.prev_values[-1]),
                     when_watcher,
@@ -767,7 +777,7 @@ def assign_variable(
             execute_conditional(
                 condition_val,
                 inside_statements,
-                namespaces,
+                captured_namespaces,
                 when_statement_watchers,
                 {},
                 [],
@@ -1489,14 +1499,21 @@ def evaluate_expression_for_real(
                     id(args[0]), when_statement_watchers
                 )
                 for when_watcher in when_watchers:  # i just wanna be done with this :(
-                    condition, inside_statements = when_watcher
+                    if len(when_watcher) == 3:
+                        condition, inside_statements, captured_namespaces = when_watcher
+                    else:
+                        condition, inside_statements = when_watcher
+                        captured_namespaces = namespaces
                     condition_val = evaluate_expression(
-                        condition, namespaces, async_statements, when_statement_watchers
+                        condition,
+                        captured_namespaces,
+                        async_statements,
+                        when_statement_watchers,
                     )
                     execute_conditional(
                         condition_val,
                         inside_statements,
-                        namespaces,
+                        captured_namespaces,
                         when_statement_watchers,
                         {},
                         [],
@@ -2402,7 +2419,7 @@ def register_when_statement(
         if name not in when_statement_watchers[-1]:
             when_statement_watchers[-1][name] = []
         when_statement_watchers[-1][name].append(
-            (built_condition, statements_inside_scope)
+            (built_condition, statements_inside_scope, deepcopy(namespaces))
         )
 
     # check the condition now
@@ -2470,7 +2487,7 @@ def determine_non_name_value(name_or_value: Token) -> GulfOfMexicoValue:
             except ValueError:
                 # Not a number, check if it's a keyword or undefined
                 if name_or_value.value in ["true", "false", "maybe", "undefined"]:
-                    # These should be in KEYWORDS, but if not found, handle here
+                    # Handle keywords not in KEYWORDS
                     match name_or_value.value:
                         case "true":
                             return GulfOfMexicoBoolean(True)
@@ -2599,7 +2616,10 @@ def interpret_code_statements(
             case VariableAssignment():
                 indexes = [
                     evaluate_expression(
-                        expr, namespaces, async_statements, when_statement_watchers
+                        expr,
+                        namespaces,
+                        async_statements,
+                        when_statement_watchers,
                     )
                     for expr in statement.indexes
                 ]
@@ -2759,7 +2779,7 @@ def interpret_code_statements(
     # Process async statements
     while async_statements:
         async_stmt = async_statements.pop(0)
-        statements_list, async_namespaces, current_index, direction = async_stmt
+        (statements_list, async_namespaces, current_index, direction) = async_stmt
 
         if current_index < len(statements_list):
             # Execute the current statement

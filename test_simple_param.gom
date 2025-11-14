@@ -1,0 +1,4 @@
+const x = 5!
+when (true) {
+   print x!
+}
