@@ -130,7 +130,7 @@ def benchmark_handler_dispatch():
         modifiers=[Token(TokenType.NAME, "var", 1, 0)],
         type_annotation=None,
         lifetime=None,
-        expression=ValueNode(Token(TokenType.NUMBER, "5", 1, 8)),
+        expression=ValueNode(Token(TokenType.NAME, "5", 1, 8)),
         debug=0,
         confidence=1,
     )
