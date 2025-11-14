@@ -12,10 +12,12 @@ pygithub = "2.2.0"
 requests = "2.31.0"
 
 [tool.poetry.scripts]
+gom-ide = "gulfofmexico.ide.app:run"
 
 [tool.poetry.extras]
 input = ["pynput"]
 globals = ["pygithub"]
+ide = ["PySide6>=6.6"]
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]

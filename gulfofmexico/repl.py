@@ -2,10 +2,12 @@
 Interactive REPL for the Gulf of Mexico language (production interpreter).
 
 Features:
-- Real execution path: tokenize → generate_syntax_tree → interpret_code_statements_main_wrapper
+- Real execution path: tokenize → generate_syntax_tree →
+    interpret_code_statements_main_wrapper
 - Persistent state across inputs (namespaces, watchers, globals)
 - Multi-line input with automatic continuation until code parses
-- Commands: :help, :quit, :reset, :load <file>, :vars
+- Commands: :help, :quit, :reset, :load <file>, :vars, :history,
+    :save <file> [all|last|<n>], :open <file>, :run <n>, :clip [last|<n>]
 
 This REPL intentionally avoids the experimental engine; it uses the
 monolithic production interpreter in gulfofmexico/interpreter.py.
@@ -42,6 +44,10 @@ class GomRepl:
         self.when_statement_watchers: interpreter.WhenStatementWatchers = [{}]
         # Export/import map across pseudo-files
         self.importable_names: dict[str, dict[str, GulfOfMexicoValue]] = {}
+        # History of successfully executed code blocks
+        self.history: list[str] = []
+        # Optional prefilled buffer to seed the next input block
+        self.prefill_lines: list[str] = []
 
         # Basic interpreter environment setup
         sys.setrecursionlimit(100000)
@@ -75,6 +81,15 @@ class GomRepl:
         """
         lines: list[str] = []
         prompt = PRIMARY_PROMPT
+        # If we have a prefilled buffer (from :open), seed it into the editor
+        if self.prefill_lines:
+            # Show a small notice and the prefilled content
+            print(f"<prefilled {len(self.prefill_lines)} line(s)>")
+            for line_text in self.prefill_lines:
+                print(line_text)
+            lines = self.prefill_lines.copy()
+            self.prefill_lines.clear()
+            prompt = CONT_PROMPT
         while True:
             try:
                 line = input(prompt)
@@ -92,7 +107,11 @@ class GomRepl:
                 interpreter.filename = REPL_FILENAME
                 interpreter.code = candidate
                 tokens = tokenize(interpreter.filename, candidate)
-                _ = generate_syntax_tree(interpreter.filename, tokens, candidate)
+                _ = generate_syntax_tree(
+                    interpreter.filename,
+                    tokens,
+                    candidate,
+                )
                 # If parse succeeds, return buffer
                 return candidate
             except InterpretationError as e:
@@ -119,6 +138,12 @@ class GomRepl:
                     ":reset             Reset all REPL state",
                     ":load <file>       Load and execute a .gom file",
                     ":vars              List current variables",
+                    ":history [n]       Show history (list or full block n)",
+                    ":save <file> [all|last|<n>]  Save history (default: all)",
+                    ":open <file>       Prefill next input with file contents",
+                    ":run [n|last]      Re-execute a history block",
+                    "                   (no arg = last)",
+                    ":clip [last|<n>]   Copy block to clipboard if available",
                 ]
             )
         )
@@ -178,6 +203,115 @@ class GomRepl:
                 return True
             self._cmd_load(" ".join(parts[1:]))
             return True
+        if op == ":history":
+            if not self.history:
+                print("<empty history>")
+                return True
+            # :history [n] → show full block n or list if no n
+            if len(parts) >= 2:
+                try:
+                    idx = int(parts[1])
+                    if idx <= 0 or idx > len(self.history):
+                        print(f"No history entry {idx}.")
+                        return True
+                    print(self.history[idx - 1])
+                except ValueError:
+                    print("Usage: :history [n]")
+                return True
+            for i, block in enumerate(self.history, start=1):
+                first = block.splitlines()[0] if block.strip() else ""
+                preview = (first[:60] + "…") if len(first) > 60 else first
+                print(f"{i:>3}: {preview}")
+            return True
+        if op == ":save":
+            # :save <file> [all|last|<n>]
+            if len(parts) < 2:
+                print("Usage: :save <file> [all|last|<n>]")
+                return True
+            target = parts[1]
+            mode = parts[2] if len(parts) >= 3 else "all"
+            try:
+                if mode == "all":
+                    content = "\n\n".join(self.history)
+                elif mode == "last":
+                    content = self.history[-1] if self.history else ""
+                else:
+                    # numeric index
+                    idx = int(mode)
+                    if idx <= 0 or idx > len(self.history):
+                        print(f"No history entry {idx}.")
+                        return True
+                    content = self.history[idx - 1]
+                Path(target).expanduser().write_text(content, encoding="utf-8")
+                print(f"Saved to {target}")
+            except ValueError:
+                print("Usage: :save <file> [all|last|<n>]")
+            except OSError as e:
+                print(f"Failed to save to {target}: {e}")
+            return True
+        if op == ":open":
+            if len(parts) < 2:
+                print("Usage: :open <file>")
+                return True
+            file = Path(" ".join(parts[1:])).expanduser()
+            if not file.exists():
+                print(f"No such file: {file}")
+                return True
+            try:
+                content = file.read_text(encoding="utf-8")
+            except OSError as e:
+                print(f"Failed to read {file}: {e}")
+                return True
+            # Stage for next input; do not execute now
+            self.prefill_lines = content.splitlines()
+            print(f"Staged {len(self.prefill_lines)} line(s) for next input.")
+            return True
+        if op == ":run":
+            try:
+                if len(parts) < 2:
+                    if not self.history:
+                        print("<empty history>")
+                        return True
+                    idx = len(self.history)
+                elif parts[1] == "last":
+                    idx = len(self.history)
+                else:
+                    idx = int(parts[1])
+                if idx <= 0 or idx > len(self.history):
+                    print(f"No history entry {idx}.")
+                    return True
+                code = self.history[idx - 1]
+                self._execute(code, filename=REPL_FILENAME)
+            except ValueError:
+                print("Usage: :run [n|last]")
+            return True
+        if op == ":clip":
+            # :clip [last|<n>] → copy block to clipboard if possible
+            if not self.history:
+                print("<empty history>")
+                return True
+            mode = parts[1] if len(parts) >= 2 else "last"
+            try:
+                if mode == "last":
+                    content = self.history[-1]
+                else:
+                    n = int(mode)
+                    if n <= 0 or n > len(self.history):
+                        print(f"No history entry {n}.")
+                        return True
+                    content = self.history[n - 1]
+            except ValueError:
+                print("Usage: :clip [last|<n>]")
+                return True
+            if self._copy_to_clipboard(content):
+                print("Copied to clipboard.")
+            else:
+                msg = (
+                    "Clipboard not available. Printed block below; "
+                    + "copy manually:\n"
+                )
+                print(msg + content)
+            return True
         print(f"Unknown command: {op}. Try :help")
         return True
 
@@ -218,6 +352,9 @@ class GomRepl:
             # Best-effort print of result
             print(result)
 
+        # Record successful block in history
+        self.history.append(code)
+
     def loop(self) -> None:
         print(self.banner())
         while True:
@@ -231,6 +368,32 @@ class GomRepl:
                     return
                 continue
             self._execute(block)
+
+    @staticmethod
+    def _copy_to_clipboard(text: str) -> bool:
+        """Best-effort clipboard copy. Returns True on success."""
+        # Try pyperclip first
+        try:
+            import pyperclip  # type: ignore
+
+            pyperclip.copy(text)
+            return True
+        except (ImportError, RuntimeError):  # pragma: no cover - optional dep
+            pass
+        # Try tkinter fallback
+        try:
+            import tkinter as tk  # type: ignore
+
+            root = tk.Tk()
+            root.withdraw()
+            root.clipboard_clear()
+            root.clipboard_append(text)
+            # Ensure clipboard persists after window closes
+            root.update()
+            root.destroy()
+            return True
+        except (ImportError, RuntimeError):  # pragma: no cover
+            return False
 
 
 def main(argv: list[str] | None = None) -> int:

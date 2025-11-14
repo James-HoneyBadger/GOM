@@ -33,7 +33,7 @@ Each of these commands installs Gulf of Mexico with the respective dependencies.
 
 Now that you have installed GulfOfMexico, you can run the REPL using the `$ GulfOfMexico` command, or you can run a file using `$ GulfOfMexico FILE`. Usage instructions here:
 
-```
+```text
 usage: GulfOfMexico [-h] [-s] [file]
 
 positional arguments:
@@ -43,6 +43,51 @@ options:
   -h, --help            show this help message and exit
   -s, --show-traceback  show the full Python trackback upon errors
 ```
+
+### REPL and CLI (module entry)
+
+You can also use the Python module entry point, which runs the production interpreter and a robust REPL:
+
+```bash
+python -m gulfofmexico                 # Start interactive REPL
+python -m gulfofmexico path/to/file.gom  # Execute a .gom file
+python -m gulfofmexico -c "print(123)!"   # Run inline code and exit
+python -m gulfofmexico -s path/file.gom   # Show full Python traceback on errors
+```
+
+REPL features:
+
+- Real execution path: tokenize → parse → interpret (no experimental engine)
+- Persistent state across inputs (variables, watchers, public globals)
+- Multi-line input with auto-continuation
+- Commands: `:help`, `:quit`, `:reset`, `:load <file>`, `:vars`
+   `:history`, `:save <file> [all|last|<n>]`, `:open <file>`,
+   `:run <n>`, `:clip [last|<n>]`
+- `:run <n|last>`, `:clip [last|<n>]`
+
+Optional: Clipboard support in REPL
+
+```bash
+Optional: Clipboard support in REPL
+```
+
+:clip` command will print the requested block so you can copy it manually.
+`:clip` command will print the requested block so you can copy it manually.
+
+### IDE (GUI)
+
+An experimental PySide6-based GUI IDE is included.
+
+- Install GUI deps (Poetry extra): `poetry install -E ide`
+- Or with pip: `pip install PySide6`
+- Launch:
+
+```bash
+python -m gulfofmexico.ide     # module entry
+gom-ide                        # via Poetry console script
+```
+
+If PySide6 is not installed, the launcher prints a helpful message.
 
 ## TODO
 
