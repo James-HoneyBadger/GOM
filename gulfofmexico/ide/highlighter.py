@@ -1,11 +1,19 @@
 from __future__ import annotations
 
-from PySide6.QtGui import (  # type: ignore
-    QColor,
-    QTextCharFormat,
-    QSyntaxHighlighter,
-    QFont,
-)
+try:
+    from PySide6.QtGui import (
+        QColor,
+        QTextCharFormat,
+        QSyntaxHighlighter,
+        QFont,
+    )
+except ImportError:
+    from PyQt5.QtGui import (
+        QColor,
+        QTextCharFormat,
+        QSyntaxHighlighter,
+        QFont,
+    )
 
 from gulfofmexico.processor.lexer import tokenize
 

@@ -70,19 +70,19 @@ print "3.14 === '3.14':" strict!
 // 10. FUNCTIONS with flexible naming
 print "10. Testing function declarations..."!
 function fullAdd(a, b) {
-    return a + b!
+   return a + b!
 }!
 
 func shortMultiply(a, b) {
-    return a * b!
+   return a * b!
 }!
 
 fun subtract(a, b) {
-    return a - b!
+   return a - b!
 }!
 
 fn divide(a, b) {
-    return a / b!
+   return a / b!
 }!
 
 var sum = fullAdd(5, 3)!

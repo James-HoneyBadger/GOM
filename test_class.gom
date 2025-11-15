@@ -1,7 +1,7 @@
 // Test class system
 class Player {
-    name = "Bob"!
-    health = 100!
+   name = "Bob"!
+   health = 100!
 }
 
 print("Class created")

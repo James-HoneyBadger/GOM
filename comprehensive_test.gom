@@ -49,12 +49,12 @@ print "x == 42:" eq ", x != 50:" neq ", x > 40:" gt ", x < 50:" lt!
 // 7. Function definitions and calls
 print "7. Testing functions..."!
 function add(a, b) {
-    var result = a + b!
-    return result!
+   var result = a + b!
+   return result!
 }!
 
 function greet(name) {
-    return "Hello, " + name + "!"!
+   return "Hello, " + name + "!"!
 }!
 
 var sum_result = add(10, 5)!

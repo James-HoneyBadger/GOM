@@ -27,7 +27,7 @@ print("Three-valued logic: maybe =", maybe_val)!
 
 // 6. Function definitions and calls (if working)
 function calculate(x, y) {
-    return x * y + 100!
+   return x * y + 100!
 }!
 print("Function result:", calculate(3, 4))!
 

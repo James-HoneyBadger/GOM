@@ -2,10 +2,10 @@
 print("=== Testing Class Declarations ===")!
 
 class Person {
-    const const name = "Default"!
-    function greet() {
-        print("Hello from class!")!
-    }!
+   const const name = "Default"!
+   function greet() {
+         print("Hello from class!")!
+   }!
 }!
 
 print("Class test complete")!

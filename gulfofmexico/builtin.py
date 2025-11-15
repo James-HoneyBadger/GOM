@@ -613,7 +613,13 @@ def db_to_string(val: GulfOfMexicoValue) -> GulfOfMexicoString:
 
 
 def db_print(*vals: GulfOfMexicoValue) -> None:
-    print(*[db_to_string(v).value for v in vals])
+    import sys
+
+    output = " ".join([db_to_string(v).value for v in vals])
+    print(output)
+    sys.stdout.flush()
+    sys.stderr.write(f"[DB_PRINT] Called with: {repr(output)}\n")
+    sys.stderr.flush()
 
 
 def db_to_number(val: GulfOfMexicoValue) -> GulfOfMexicoNumber:

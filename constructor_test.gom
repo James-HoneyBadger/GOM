@@ -8,5 +8,5 @@ const obj2 = new ComplexClass(42, "hello")!
 
 // Constructor in an if statement
 if true {
-    const obj3 = new AnotherClass(1, 2, 3)!
+   const obj3 = new AnotherClass(1, 2, 3)!
 }!

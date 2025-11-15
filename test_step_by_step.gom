@@ -12,7 +12,7 @@ print("Maybe value:", maybe_val)!
 
 print("=== Testing Function Definitions ===")!
 function test_func(a, b) {
-    print("Inside function:", a, b)!
-    return a + b!
+   print("Inside function:", a, b)!
+   return a + b!
 }!
 print("Function result:", test_func(3, 4))!

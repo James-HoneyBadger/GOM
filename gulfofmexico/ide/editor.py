@@ -1,8 +1,15 @@
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QRect, QSize
-from PySide6.QtGui import QColor, QPainter, QTextFormat
-from PySide6.QtWidgets import QPlainTextEdit, QWidget, QTextEdit
+from gulfofmexico.ide.qt_compat import Qt, QWidget, QTextEdit
+
+try:
+    from PySide6.QtCore import QRect, QSize
+    from PySide6.QtGui import QColor, QPainter, QTextFormat
+    from PySide6.QtWidgets import QPlainTextEdit
+except ImportError:
+    from PyQt5.QtCore import QRect, QSize
+    from PyQt5.QtGui import QColor, QPainter, QTextFormat
+    from PyQt5.QtWidgets import QPlainTextEdit
 
 
 class LineNumberArea(QWidget):

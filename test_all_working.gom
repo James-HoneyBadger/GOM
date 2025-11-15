@@ -24,8 +24,8 @@ print("Math interpolation: ${3 + 4} = 7")!
 
 // Function definitions and calls
 function greet(person, greeting) {
-    print("${greeting}, ${person}!")!
-    return "Function result"!
+   print("${greeting}, ${person}!")!
+   return "Function result"!
 }!
 
 print("Function call:", greet("Alice", "Hello"))!

@@ -5,15 +5,14 @@ from pathlib import Path
 import json
 from functools import partial
 
+# Use compatibility layer for Qt
 try:
-    from PySide6.QtCore import (
+    from gulfofmexico.ide.qt_compat import (
         Qt,
         QThread,
         Signal,
         QObject,
         QTimer,
-    )  # type: ignore
-    from PySide6.QtWidgets import (  # type: ignore
         QApplication,
         QFileDialog,
         QMainWindow,
@@ -25,13 +24,17 @@ try:
         QPushButton,
         QTextEdit,
         QTabWidget,
+        QAction,
+        QGuiApplication,
+        QMenu,
+        QT_VERSION,
     )
-    from PySide6.QtGui import QAction, QGuiApplication  # type: ignore
-    from PySide6.QtWidgets import QMenu  # type: ignore
 
     PYSIDE_AVAILABLE = True
-except ImportError:  # pragma: no cover - environment without PySide6
+except ImportError as e:
     PYSIDE_AVAILABLE = False
+    print(f"Qt not available: {e}")
+    print("Install with: pip install PySide6 or pip install PyQt5")
 
 from gulfofmexico.ide.runner import ExecutionSession, run_code
 

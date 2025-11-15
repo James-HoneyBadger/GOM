@@ -60,19 +60,19 @@ print "Comparisons:" equal notEqual greater lessEqual!
 // ✅ 9. FUNCTION DECLARATION VARIATIONS - All specified forms
 print "9. Function declaration variations..."!
 function fullName(a, b) {
-    return a + b!
+   return a + b!
 }!
 
 func shortName(a, b) {
-    return a * b!  
+   return a * b!  
 }!
 
 fun funName(a, b) {
-    return a - b!
+   return a - b!
 }!
 
 fn minName(a, b) {
-    return a / b!
+   return a / b!
 }!
 
 print "Function results:" fullName(10, 5) shortName(3, 4) funName(20, 8) minName(12, 3)!

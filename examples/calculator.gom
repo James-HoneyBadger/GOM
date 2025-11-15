@@ -3,11 +3,11 @@ const PI = 3.14159;
 const E = 2.71828;
 
 function calculateArea(radius) {
-    return PI * radius * radius;
+   return PI * radius * radius;
 }
 
 function calculateCircumference(radius) {
-    return 2 * PI * radius;
+   return 2 * PI * radius;
 }
 
 print 'GulfOfMexico Calculator';
@@ -24,6 +24,6 @@ print 'Circumference: ' + circumference;
 // Variable demonstration
 let counter = 0;
 while counter < 3 {
-    print 'Counter: ' + counter;
-    counter = counter + 1;
+   print 'Counter: ' + counter;
+   counter = counter + 1;
 }

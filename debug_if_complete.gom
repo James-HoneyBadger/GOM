@@ -1,9 +1,9 @@
 if true {
-    const x = 5!
+   const x = 5!
 }!
 
 if false {
-    const y = 10!
+   const y = 10!
 } else {
-    const z = 20!
+   const z = 20!
 }!

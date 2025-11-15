@@ -4,7 +4,7 @@ var var test = 1!
 print(test)!
 
 when test == 5 {
-    print('test is 5')!
+   print('test is 5')!
 }!
 
 test = 5!

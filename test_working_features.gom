@@ -17,7 +17,7 @@ print("Arithmetic:", sum)!
 
 // Test conditionals
 if (x > 50) {
-    print("Conditional: x is greater than 50")!
+   print("Conditional: x is greater than 50")!
 }!
 
 // Test three-value boolean (maybe)

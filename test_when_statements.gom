@@ -6,9 +6,9 @@ print(counter)!
 
 // Set up a when statement that reacts to counter changes
 when (counter > 5) {
-    print('Counter exceeded 5!')!
-    print('Current value:')!
-    print(counter)!
+   print('Counter exceeded 5!')!
+   print('Current value:')!
+   print(counter)!
 }!
 
 print('Incrementing counter...')!
