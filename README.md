@@ -1,500 +1,998 @@
-# Gulf of Mexico Interpreter# Gulf of Mexico Interpreter
+# Gulf of Mexico Programming Language# Gulf of Mexico Interpreter# Gulf of Mexico Interpreter
 
 
 
-An interpreter for the Gulf of Mexico programming language - an esoteric language featuring exclamation mark terminators, -1-indexed arrays, four variable types, and many other delightful quirks.This is the interpreter for the perfect programming language. It is made in Python, for the sole reason that the interpreter can itself be interpreted. Future plans include creating a Gulf of Mexico interpreter in GulfOfMexico, so that the Gulf of Mexico Interpreter can be passed into the Gulf of Mexico Interpreter Interpreter, which is then interpreted by the Gulf of Mexico Interpreter Interpreter Interpreter (a.k.a. Python). This may or may not be created due to difficulty moving everything over and whatnot. I'll try though.
+An esoteric programming language interpreter with probabilistic variables, -1 array indexing, and temporal lifetimes.
 
 
 
-## Quick StartThis is incredibly slow. My implementation of Gulf of Mexico is suboptimal, which itself runs on a subperformant language (Python), which runs on a pretty fast language (C). However, speed was never a focus in creating my interpreter for Gulf of Mexico and shouldn't be - it's not a language meant for day-to-day use - it's a work of art.
+## Quick StartAn interpreter for the Gulf of Mexico programming language - an esoteric language featuring exclamation mark terminators, -1-indexed arrays, four variable types, and many other delightful quirks.This is the interpreter for the perfect programming language. It is made in Python, for the sole reason that the interpreter can itself be interpreted. Future plans include creating a Gulf of Mexico interpreter in GulfOfMexico, so that the Gulf of Mexico Interpreter can be passed into the Gulf of Mexico Interpreter Interpreter, which is then interpreted by the Gulf of Mexico Interpreter Interpreter Interpreter (a.k.a. Python). This may or may not be created due to difficulty moving everything over and whatnot. I'll try though.
 
 
 
-```bash## Architecture
+```bash
 
 # Install
 
-pip install -e .The interpreter is a **monolithic Python implementation** (~2,900 lines in `gulfofmexico/interpreter.py`) that directly executes Gulf of Mexico code. It uses a three-stage pipeline:
+pip install -e .## Quick StartThis is incredibly slow. My implementation of Gulf of Mexico is suboptimal, which itself runs on a subperformant language (Python), which runs on a pretty fast language (C). However, speed was never a focus in creating my interpreter for Gulf of Mexico and shouldn't be - it's not a language meant for day-to-day use - it's a work of art.
 
 
 
-# Run a program1. **Lexer** (`processor/lexer.py`) - Tokenizes source code
+# Run a program
 
-gulfofmexico your_program.gom2. **Parser** (`processor/syntax_tree.py`) - Builds abstract syntax tree (AST)
+python -m gulfofmexico script.gom
 
-3. **Interpreter** (`interpreter.py`) - Directly executes AST using pattern matching
+```bash## Architecture
 
-# Interactive REPL
+# Start REPL
 
-gulfofmexico**Note:** The `gulfofmexico/engine/` package contains an experimental modular architecture that is NOT used in production. The actual interpreter uses the original monolithic design in `interpreter.py`.
-
-
-
-# Web-based IDE📖 **For detailed architecture documentation, see [ACTUAL_ARCHITECTURE.md](ACTUAL_ARCHITECTURE.md)**
-
-python -m gulfofmexico.ide --web
-
-```## Installation
+python -m gulfofmexico# Install
 
 
 
-## InstallationYou can install Gulf of Mexico from PyPi, by doing any the following:
+# Launch IDE (Qt or Web-based)pip install -e .The interpreter is a **monolithic Python implementation** (~2,900 lines in `gulfofmexico/interpreter.py`) that directly executes Gulf of Mexico code. It uses a three-stage pipeline:
 
-
-
-### From Source```
-
-pip install GulfOfMexico 
-
-```bashpip install "GulfOfMexico[input, globals]"
-
-git clone https://github.com/James-HoneyBadger/GOM.gitpip install "GulfOfMexico[input]"
-
-cd GOMpip install "GulfOfMexico[globals]"
-
-python -m venv .venv```
-
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-pip install -e .Each of these commands installs Gulf of Mexico with the respective dependencies. `input` installs the `pynput` package and allows the use of `after` statements and event watchers. `globals` installs `PyGithub` and allows you to declare `const const const` variables that are publically stored using GitHub. Note: to use the latter, you must enter a [Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) in the `GITHUB_ACCESS_TOKEN` environment variable.
+python -m gulfofmexico.ide
 
 ```
 
-## Usage
 
-### Requirements
 
-Now that you have installed GulfOfMexico, you can run the REPL using the `$ GulfOfMexico` command, or you can run a file using `$ GulfOfMexico FILE`. Usage instructions here:
+## Core Features# Run a program1. **Lexer** (`processor/lexer.py`) - Tokenizes source code
 
-- Python 3.10 or higher
 
-- Optional dependencies:```text
 
-  - `PySide6` or `PyQt5` for Qt-based GUI (not required for web IDE)usage: GulfOfMexico [-h] [-s] [file]
+### 1. Array Indexing Starts at -1gulfofmexico your_program.gom2. **Parser** (`processor/syntax_tree.py`) - Builds abstract syntax tree (AST)
+
+
+
+Arrays/lists in Gulf of Mexico start at index -1, not 0:3. **Interpreter** (`interpreter.py`) - Directly executes AST using pattern matching
+
+
+
+```# Interactive REPL
+
+const numbers [-1, 0, 1, 2, 3]!
+
+print(numbers[-1])!  // Prints: -1gulfofmexico**Note:** The `gulfofmexico/engine/` package contains an experimental modular architecture that is NOT used in production. The actual interpreter uses the original monolithic design in `interpreter.py`.
+
+print(numbers[0])!   // Prints: 0
+
+print(numbers[3])!   // Prints: 3
+
+```
+
+# Web-based IDE📖 **For detailed architecture documentation, see [ACTUAL_ARCHITECTURE.md](ACTUAL_ARCHITECTURE.md)**
+
+### 2. Fractional Array Indexing
+
+python -m gulfofmexico.ide --web
+
+Insert elements between existing positions using fractional indexes:
+
+```## Installation
+
+```
+
+const list [10, 20, 30]!
+
+list[0.5] = 99!  // Inserts 99 between index 0 and 1
+
+// list is now: [10, 20, 99, 30]## InstallationYou can install Gulf of Mexico from PyPi, by doing any the following:
+
+```
+
+
+
+### 3. Probabilistic Variables with Confidence
+
+### From Source```
+
+Variables have confidence levels (!, !!, !!!) that determine priority:
+
+pip install GulfOfMexico 
+
+```
+
+const x 10!      // Confidence level 1```bashpip install "GulfOfMexico[input, globals]"
+
+const x 20!!     // Confidence level 2 (overwrites level 1)
+
+const x 30!!!    // Confidence level 3 (highest priority)git clone https://github.com/James-HoneyBadger/GOM.gitpip install "GulfOfMexico[input]"
+
+print(x)!        // Prints: 30
+
+```cd GOMpip install "GulfOfMexico[globals]"
+
+
+
+### 4. Variable Lifetimespython -m venv .venv```
+
+
+
+Variables can have temporal or line-based lifetimes:source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+
+
+```pip install -e .Each of these commands installs Gulf of Mexico with the respective dependencies. `input` installs the `pynput` package and allows the use of `after` statements and event watchers. `globals` installs `PyGithub` and allows you to declare `const const const` variables that are publically stored using GitHub. Note: to use the latter, you must enter a [Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) in the `GITHUB_ACCESS_TOKEN` environment variable.
+
+// Temporal lifetime (5 seconds)
+
+const temp <5.0> = 42!```
+
+
+
+// Line-based lifetime (expires after 10 lines)## Usage
+
+const shortLived 10 = 100!
+
+```### Requirements
+
+
+
+### 5. Three-Valued Boolean LogicNow that you have installed GulfOfMexico, you can run the REPL using the `$ GulfOfMexico` command, or you can run a file using `$ GulfOfMexico FILE`. Usage instructions here:
+
+
+
+Booleans can be `true`, `false`, or `maybe`:- Python 3.10 or higher
+
+
+
+```- Optional dependencies:```text
+
+const certain true!
+
+const uncertain maybe!  - `PySide6` or `PyQt5` for Qt-based GUI (not required for web IDE)usage: GulfOfMexico [-h] [-s] [file]
+
+const wrong false!
 
   - `pynput` for input handling features
 
-  - `pygithub` for global variable featurespositional arguments:
+if maybe {
 
-  file                  the file containing your Gulf of Mexico code
+   print("This might execute")!  - `pygithub` for global variable featurespositional arguments:
 
-## Language Features
+}
 
-options:
-
-### Statement Terminators  -h, --help            show this help message and exit
-
-  -s, --show-traceback  show the full Python trackback upon errors
-
-All statements end with `!`:```
+```  file                  the file containing your Gulf of Mexico code
 
 
 
-```gom### REPL and CLI (module entry)
+### 6. Flexible String Quoting## Language Features
 
-print("Hello, World!")!
 
-const var x = 5!You can also use the Python module entry point, which runs the production interpreter and a robust REPL:
+
+Strings use quote count matching instead of traditional quoting:options:
+
+
+
+```### Statement Terminators  -h, --help            show this help message and exit
+
+const s1 "hello"!       // Single quotes each side
+
+const s2 ""world""!     // Two quotes each side  -s, --show-traceback  show the full Python trackback upon errors
+
+const s3 '"mixed"'!     // One single, one double each side
+
+```All statements end with `!`:```
+
+
+
+### 7. String Interpolation
+
+
+
+Embed expressions in strings with `${}`:```gom### REPL and CLI (module entry)
+
+
+
+```print("Hello, World!")!
+
+const name "Alice"!
+
+const age 30!const var x = 5!You can also use the Python module entry point, which runs the production interpreter and a robust REPL:
+
+print("Hello, ${name}! You are ${age} years old.")!
+
+// Prints: Hello, Alice! You are 30 years old.```
 
 ```
 
 ```bash
 
+### 8. Next/Previous Value Tracking
+
 Debug mode statements end with `?`:python -m gulfofmexico                 # Start interactive REPL
+
+Access future and past values of variables:
 
 python -m gulfofmexico path/to/file.gom  # Execute a .gom file
 
-```gompython -m gulfofmexico -c "print(123)!"   # Run inline code and exit
+```
 
-print("Debug output")?python -m gulfofmexico -s path/file.gom   # Show full Python traceback on errors
+const x 10!```gompython -m gulfofmexico -c "print(123)!"   # Run inline code and exit
 
-``````
+print(previous(x))!  // undefined initially
+
+x = 20!print("Debug output")?python -m gulfofmexico -s path/file.gom   # Show full Python traceback on errors
+
+print(previous(x))!  // Prints: 10
+
+`````````
 
 
 
-Multiple exclamation marks indicate confidence levels:REPL features:
+### 9. Reactive Programming with `when`
 
 
+
+Execute code automatically when conditions become true:Multiple exclamation marks indicate confidence levels:REPL features:
+
+
+
+```
+
+var temperature 20!
 
 ```gom- Real execution path: tokenize → parse → interpret (no experimental engine)
 
-const var important = 100!!- Persistent state across inputs (variables, watchers, public globals)
+when temperature > 30 {
+
+   print("It's hot!")!const var important = 100!!- Persistent state across inputs (variables, watchers, public globals)
+
+}
 
 const var very_important = 200!!!- Multi-line input with auto-continuation
 
-```- Commands: `:help`, `:quit`, `:reset`, `:load <file>`, `:vars`
+temperature = 35!  // Triggers the when statement
 
-   `:history`, `:save <file> [all|last|<n>]`, `:open <file>`,
+``````- Commands: `:help`, `:quit`, `:reset`, `:load <file>`, `:vars`
 
-### Variable Declarations   `:run <n>`, `:clip [last|<n>]`
 
-- `:run <n|last>`, `:clip [last|<n>]`
 
-Four combinations of mutability:
+### 10. Async/Await Functions   `:history`, `:save <file> [all|last|<n>]`, `:open <file>`,
 
-Optional: Clipboard support in REPL
 
-```gom
+
+Functions can run asynchronously:### Variable Declarations   `:run <n>`, `:clip [last|<n>]`
+
+
+
+```- `:run <n|last>`, `:clip [last|<n>]`
+
+async function fetchData() => {
+
+   // Async operationFour combinations of mutability:
+
+   return 42!
+
+}!Optional: Clipboard support in REPL
+
+
+
+const result await(fetchData())!```gom
+
+```
 
 const const name = "Alice"!     // Cannot reassign or modify```bash
 
+## Variable Modifiers
+
 const var count = 0!            // Can modify, cannot reassignOptional: Clipboard support in REPL
+
+### `const` - Immutable Value
 
 var const limit = 100!          // Can reassign, cannot modify```
 
-var var value = 5!              // Can reassign and modify
+```
 
-```:clip` command will print the requested block so you can copy it manually.
+const x 10!var var value = 5!              // Can reassign and modify
 
-`:clip` command will print the requested block so you can copy it manually.
+x = 20!  // Error: cannot modify const
 
-### Array Indexing
+``````:clip` command will print the requested block so you can copy it manually.
 
-### IDE (GUI)
+
+
+### `var` - Mutable Reference`:clip` command will print the requested block so you can copy it manually.
+
+
+
+```### Array Indexing
+
+var x 10!
+
+x = 20!  // OK### IDE (GUI)
+
+```
 
 Arrays start at **-1** (not 0):
 
+### `const var` - Mutable Value, Immutable Reference
+
 An experimental PySide6-based GUI IDE is included.
 
-```gom
+```
 
-const const scores = [3, 2, 5]!- Install GUI deps (Poetry extra): `poetry install -E ide`
+const var list [1, 2, 3]!```gom
+
+list[0] = 99!   // OK: can modify elements
+
+list = [4, 5]!  // Error: cannot reassignconst const scores = [3, 2, 5]!- Install GUI deps (Poetry extra): `poetry install -E ide`
+
+```
 
 print(scores[-1])!  // Prints: 3 (first element)- Or with pip: `pip install PySide6`
 
+### `const const const` - Immutable Global
+
 print(scores[0])!   // Prints: 2 (second element)- Launch:
+
+Triple const creates globally shared immutable constants:
 
 print(scores[1])!   // Prints: 5 (third element)
 
-``````bash
-
-python -m gulfofmexico.ide     # module entry
-
-### Float Indexinggom-ide                        # via Poetry console script
-
 ```
 
-Insert elements at float indices:
+const const const PI 3.14159!``````bash
 
-If PySide6 is not installed, the launcher prints a helpful message.
+// Saved to ~/.gulfofmexico_runtime and optionally synced to GitHub
+
+```python -m gulfofmexico.ide     # module entry
+
+
+
+## Operators### Float Indexinggom-ide                        # via Poetry console script
+
+
+
+### Arithmetic```
+
+- `+` Addition / String concatenation
+
+- `-` Subtraction / Negation / ReverseInsert elements at float indices:
+
+- `*` Multiplication
+
+- `/` DivisionIf PySide6 is not installed, the launcher prints a helpful message.
+
+- `^` Exponentiation
 
 ```gom
 
-var var numbers = [1, 2, 3]!## TODO
+### Comparison
 
-numbers[0.5] = 99!
+- `<` Less thanvar var numbers = [1, 2, 3]!## TODO
+
+- `>` Greater than
+
+- `<=` Less than or equalnumbers[0.5] = 99!
+
+- `>=` Greater than or equal
 
 print(numbers)!  // [1, 99, 2, 3]- Add another expression type which is just the dot operator, used for indexing and accessing names
 
-```- Better debugging (pretty limited for the time being)
+### Equality (Multiple Levels)
 
-- A much better standard library
+- `=` Approximate equality (fuzzy matching)```- Better debugging (pretty limited for the time being)
+
+- `==` Regular equality
+
+- `===` Strict equality (identity for mutables)- A much better standard library
+
+- `====` Really strict equality (always identity)
 
 ### Functions- Allow for declaring basic objects with {} and other things.
 
-- Add a way to deal with file objects
+### Logical
 
-Multiple function keywords (all equivalent):
+- `&` AND (short-circuits)- Add a way to deal with file objects
 
-## Absent Features
+- `|` OR (short-circuits)
 
-```gom
-
-function add(a, b) => {The goal of this project is to implement every feature from the Gulf of Mexico language. A list of features is in the README file of the project, linked [here](https://github.com/TodePond/GulfOfMexico---e-acc). Here is a working list of features that there is no chance I will implement (new features may be added - or I should say, removed - as I work on this project and realize I'm too stupid to implement them):
-
-   return a + b!
-
-}!- DB3X: I am not going to even try to parse XML AND parse DB code.
-
-- Regex: Since type hints seem to not even do anything there is no point in implementing a Regex parser.
-
-func multiply(x, y) => x * y!- "Variable Hoisting" (being able to declare variables with a negative lifetime): Given the fact that keywords can be renamed and reassigned in this language, it does not make sense to implement this as the following breaks:
+- `;` NOT (unary)Multiple function keywords (all equivalent):
 
 
 
-fun divide(a, b) => {    ```javascript
+### Inequality## Absent Features
 
-   return a / b!    print(name)
+- `;=` Not equal (approximately)
 
-}!    var const = "lol";
+- `;==` Not equal (regular)```gom
 
-    const const name<-2> = "Jake";
+- `;===` Not equal (strict)
 
-fn subtract(x, y) => x - y!    ```
-
-```
-
-    It is impossible to evaluate the expression on the right side of the `name` declaration after the print statement. Additionally, doing so doesn't account for possible renaming of keywords in the second line.
-
-### Booleans- Any sort of autocomplete requires more brainpower than I am willing to put in.
+- `;====` Not equal (really strict)function add(a, b) => {The goal of this project is to implement every feature from the Gulf of Mexico language. A list of features is in the README file of the project, linked [here](https://github.com/TodePond/GulfOfMexico---e-acc). Here is a working list of features that there is no chance I will implement (new features may be added - or I should say, removed - as I work on this project and realize I'm too stupid to implement them):
 
 
 
-Three-valued boolean system:To my knowledge, everything else has been or will be implemented.
+## Control Flow   return a + b!
 
 
 
-```gom## Implemented Features
-
-const const is_true = true!
-
-const const is_false = false!These are features that are implemented according to the [GulfOfMexico specification](https://github.com/TodePond/GulfOfMexico---e-acc) in this interpreter.
-
-const const is_maybe = maybe!
-
-```### Exclamation Marks
+### If Statements}!- DB3X: I am not going to even try to parse XML AND parse DB code.
 
 
 
-### StringsBe bold! End every statement with an exclamation mark!
+```- Regex: Since type hints seem to not even do anything there is no point in implementing a Regex parser.
 
+if condition {
 
+   // codefunc multiply(x, y) => x * y!- "Variable Hoisting" (being able to declare variables with a negative lifetime): Given the fact that keywords can be renamed and reassigned in this language, it does not make sense to implement this as the following breaks:
 
-Multiple quote styles:```javascript
-
-print("Hello world")!
-
-```gom```
-
-const const single = 'hello'!
-
-const const double = "world"!If you're feeling extra-bold, you can use even more!!!
-
-const const triple = """multiline
-
-string"""!```javascript
-
-```print("Hello world")!!!
+}
 
 ```
 
-Zero quotes (bare words):
 
-If you're unsure, that's ok. You can put a question mark at the end of a line instead. It prints debug info about that line to the console for you.
 
-```gom
+### When Statements (Reactive)fun divide(a, b) => {    ```javascript
 
-const const name = hello!  // Equivalent to "hello"```javascript
 
-```print("Hello world")?
 
-```
+```   return a / b!    print(name)
 
-String interpolation with regional currency symbols:
+when condition {
 
-You might be wondering what Gulf of Mexico uses for the 'not' operator, which is an exclamation mark in most other languages. That's simple - the 'not' operator is a semi-colon instead.
+   // executes whenever condition becomes true}!    var const = "lol";
 
-```gom
+}
 
-const var name = "Alice"!```javascript
+```    const const name<-2> = "Jake";
 
-print("Hello ${name}!")!       // $-styleif (;false) {
 
-print("Hello £{name}!")!       // £-style   print("Hello world")!
 
-print("Hello €{name}!")!       // €-style}
+### After Statements (Scheduled)fn subtract(x, y) => x - y!    ```
+
+
 
 ``````
 
+after <5.0> {
 
+   print("5 seconds later")!    It is impossible to evaluate the expression on the right side of the `name` declaration after the print statement. Additionally, doing so doesn't account for possible renaming of keywords in the second line.
 
-### Classes### Declarations
+}
 
-
-
-```gomThere are four types of declaration. Constant constants can't be changed in any way.
-
-class Player {
-
-   const var health = 100!```javascript
-
-   const var score = 0!const const name = "Luke"!
-
-}!```
+```### Booleans- Any sort of autocomplete requires more brainpower than I am willing to put in.
 
 
 
-const var player = new Player()!Constant variables can be edited, but not re-assigned.
+## Functions
 
-print(player)!
 
-``````javascript
 
-const var name = "Luke"!
+### Regular FunctionsThree-valued boolean system:To my knowledge, everything else has been or will be implemented.
 
-### Conditionalsname.pop()!
 
-name.pop()!
-
-```gom```
-
-const var x = 10!
-
-Variable constants can be re-assigned, but not edited.
-
-if (x > 5) {
-
-   print("Greater than 5")!```javascript
-
-}!var const name = "Luke"!
-
-```name = "Lu"!
 
 ```
 
-### Import/Export
+function add(a, b) => a + b!
 
-Variable variables can be re-assigned and edited.
+```gom## Implemented Features
 
-```gom
+// Flexible keyword matching
 
-// export.gom```javascript
+fn multiply(a, b) => a * b!const const is_true = true!
 
-export const const message = "Hello"!var var name = "Luke"!
+func divide(a, b) => a / b!
 
-export const var count = 42!name = "Lu"!
-
-name.push("k")!
-
-// main.gomname.push("e")!
-
-import message from "export.gom"!```
-
-print(message)!
-
-```### Immutable Data
+```const const is_false = false!These are features that are implemented according to the [GulfOfMexico specification](https://github.com/TodePond/GulfOfMexico---e-acc) in this interpreter.
 
 
 
-### Reverse Statement**New for 2023!**<br>
-
-Mutable data is an anti-pattern. Use the `const const const` keyword to make a constant constant constant. Its value will become constant and immutable, and will _never change_. Please be careful with this keyword, as it is very powerful, and will affect all users globally forever.
-
-Undo variable assignments:
-
-```javascript
-
-```gomconst const const pi = 3.14!
-
-var var x = 5!```
-
-print(x)!  // 5
-
-x = 10!#### Notes About Implementation
-
-print(x)!  // 10
-
-reverse!This is added by me (the interpreter)! I wanted to share how this works.
-
-print(x)!  // 5
-
-```Thanks to [this repo](https://github.com/marcizhu/marcizhu) for helpful reference for issues and actions in Python.
+### Async Functionsconst const is_maybe = maybe!
 
 
 
-### Temporal Keywords**Local Storage (Primary):** Immutable constants are stored locally in your home directory under `~/.GulfOfMexico_runtime/.immutable_constants` and `~/.GulfOfMexico_runtime/.immutable_constants_values/`. This ensures they persist across sessions and work offline.
+``````### Exclamation Marks
 
+async function slowOperation() => {
 
+   // async code
 
-Access variable history:**Global Storage (Optional):** When possible, constants are also shared globally via GitHub Issues API:
+   return result!
 
-
-
-```gom- On the user's side, open a GitHub issue with a title of the format `Create Public Global: {name};;;{confidence}` and the body containing the pickled version of the value.
-
-var var x = 10!- Then, run a GitHub workflow that puts the issue body into a file under `global_objects/` and add an entry to `public_globals.txt` that contains the `name;;;id;;;confidence`
-
-x = 20!- Finally, to retrieve these values, the content of each of these files is fetched and converted back into values.
-
-x = 30!
-
-print(current(x))!   // 30If GitHub is unavailable (no internet, no API token), the constants still work perfectly - they're just stored locally only.
-
-print(previous(x))!  // 20
-
-```### Naming
-
-
-
-### OperatorsBoth variables and constants can be named with any Unicode character or string.
-
-
-
-**Arithmetic:** `+`, `-`, `*`, `/`, `^` (exponentiation)```javascript
-
-const const firstAlphabetLetter = 'A'!
-
-**Comparison:** `>`, `<`, `>=`, `<=`, `==`, `!=`var const 👍 = True!
-
-var var 1️⃣ = 1!
-
-**Logical:** `&` (AND), `|` (OR), `;` (NOT)```
-
-
-
-**Division by zero returns `undefined`:**This includes numbers, and other language constructs.
-
-
-
-```gom```javascript
-
-const var result = 10 / 0!const const unchanging = const!
-
-print(result)!  // undefinedunchanging unchanging 5 = 4!
-
-```print(2 + 2 === 5)! //true
+}!### StringsBe bold! End every statement with an exclamation mark!
 
 ```
 
-### Delete Statement
-
-### Arrays
-
-Delete values from memory:
-
-Some languages start arrays at `0`, which can be unintuitive for beginners. Some languages start arrays at `1`, which isn't representative of how the code actually works. Gulf of Mexico does the best of both worlds: Arrays start at `-1`.
-
-```gom
-
-delete 3!```javascript
-
-delete "hello"!const const scores = [3, 2, 5]!
-
-delete true!print(scores[-1])! //3
-
-```print(scores[0])!  //2
-
-print(scores[1])!  //5
-
-### Indentation```
 
 
+## Classes and Objects
 
-**All indentation must be multiples of 3 spaces:****New for 2022!**<br>
+Multiple quote styles:```javascript
 
-You can now use floats for indexes too!
+```
 
-```gom
+class Person {print("Hello world")!
 
-function example() => {```javascript
+   const name "Unknown"!
 
-   const var x = 5!const var scores = [3, 2, 5]!
+   var age 0!```gom```
 
-   if (x > 0) {scores[0.5] = 4!
+   
 
-      print("Positive")!print(scores)! //[3, 2, 4, 5]
+   function greet() => {const const single = 'hello'!
 
-   }!```
+      print("Hello, I'm ${name}")!
+
+   }!const const double = "world"!If you're feeling extra-bold, you can use even more!!!
 
 }!
 
+const const triple = """multiline
+
+const alice new Person()!
+
+alice.name = "Alice"!string"""!```javascript
+
+alice.age = 30!
+
+alice.greet()!```print("Hello world")!!!
+
+```
+
+```
+
+## Built-in Functions
+
+Zero quotes (bare words):
+
+### Type Conversion
+
+- `Number(x)` - Convert to numberIf you're unsure, that's ok. You can put a question mark at the end of a line instead. It prints debug info about that line to the console for you.
+
+- `String(x)` - Convert to string
+
+- `Boolean(x)` - Convert to boolean```gom
+
+
+
+### I/Oconst const name = hello!  // Equivalent to "hello"```javascript
+
+- `print(...)` - Print values
+
+- `read(path)` - Read file```print("Hello world")?
+
+- `write(path, content)` - Write file
+
+```
+
+### Data Structures
+
+- `Map()` - Create dictionary/mapString interpolation with regional currency symbols:
+
+- `use(value)` - Create signal
+
+You might be wondering what Gulf of Mexico uses for the 'not' operator, which is an exclamation mark in most other languages. That's simple - the 'not' operator is a semi-colon instead.
+
+### Control
+
+- `sleep(seconds)` - Pause execution```gom
+
+- `exit()` - Exit program
+
+const var name = "Alice"!```javascript
+
+### Regex
+
+- `regex_match(pattern, text)` - Test patternprint("Hello ${name}!")!       // $-styleif (;false) {
+
+- `regex_findall(pattern, text)` - Find all matches
+
+- `regex_replace(pattern, replacement, text)` - Replace matchesprint("Hello £{name}!")!       // £-style   print("Hello world")!
+
+
+
+### Math Functionsprint("Hello €{name}!")!       // €-style}
+
+All functions from Python's `math` module: `sin`, `cos`, `sqrt`, `log`, etc.
+
+``````
+
+### Word Numbers
+
+- `zero` through `ninteen` - Numbers 0-19
+
+- `twenty` through `ninety` - Returns function that adds tens place
+
+  ```### Classes### Declarations
+
+  const twentyThree twenty(three)!  // 23
+
+  ```
+
+
+
+## Debug Modifiers```gomThere are four types of declaration. Constant constants can't be changed in any way.
+
+
+
+Add `?` after statements for debugging output:class Player {
+
+
+
+```   const var health = 100!```javascript
+
+const x 10?     // Level 1: Show value
+
+const y 20??    // Level 2: Show value and names   const var score = 0!const const name = "Luke"!
+
+const z 30???   // Level 3: Show value, names, and expression tree
+
+const w 40????  // Level 4: Show everything}!```
+
+```
+
+
+
+## Import/Export
+
+const var player = new Player()!Constant variables can be edited, but not re-assigned.
+
+### Multi-File Programs
+
+print(player)!
+
+Split files using `=====` markers:
+
+``````javascript
+
+```
+
+===== math_utils =====const var name = "Luke"!
+
+function square(n) => n * n!
+
+export square to main!### Conditionalsname.pop()!
+
+
+
+===== main =====name.pop()!
+
+import square!
+
+print(square(5))!  // Prints: 25```gom```
+
+```
+
+const var x = 10!
+
+## Installation
+
+Variable constants can be re-assigned, but not edited.
+
+### From Source
+
+if (x > 5) {
+
+```bash
+
+git clone https://github.com/James-HoneyBadger/GOM.git   print("Greater than 5")!```javascript
+
+cd GOM
+
+pip install -e .}!var const name = "Luke"!
+
+```
+
+```name = "Lu"!
+
+### Dependencies
+
+```
+
+Required:
+
+- Python 3.10+### Import/Export
+
+- requests 2.31.0
+
+Variable variables can be re-assigned and edited.
+
+Optional:
+
+- pynput 1.7.6 (for keyboard/mouse input)```gom
+
+- pygithub 2.2.0 (for global variable sync)
+
+- PySide6 or PyQt5 (for Qt-based IDE)// export.gom```javascript
+
+
+
+## IDEexport const const message = "Hello"!var var name = "Luke"!
+
+
+
+Gulf of Mexico includes both Qt-based and web-based IDEs:export const var count = 42!name = "Lu"!
+
+
+
+```bashname.push("k")!
+
+# Launch IDE (tries Qt, falls back to web)
+
+python -m gulfofmexico.ide// main.gomname.push("e")!
+
+
+
+# Force web-based IDEimport message from "export.gom"!```
+
+python -m gulfofmexico.ide --web
+
+```print(message)!
+
+
+
+The web IDE runs on `http://localhost:8080/ide` and includes:```### Immutable Data
+
+- Syntax highlighting
+
+- Example programs
+
+- Save/Load functionality
+
+- Execution with output capture### Reverse Statement**New for 2023!**<br>
+
+- No dependencies (uses Python's built-in http.server)
+
+Mutable data is an anti-pattern. Use the `const const const` keyword to make a constant constant constant. Its value will become constant and immutable, and will _never change_. Please be careful with this keyword, as it is very powerful, and will affect all users globally forever.
+
+## Command-Line Usage
+
+Undo variable assignments:
+
+```bash
+
+# Run a file```javascript
+
+python -m gulfofmexico script.gom
+
+```gomconst const const pi = 3.14!
+
+# Inline code
+
+python -m gulfofmexico -c "print(123)!"var var x = 5!```
+
+
+
+# REPLprint(x)!  // 5
+
+python -m gulfofmexico
+
+x = 10!#### Notes About Implementation
+
+# Show Python traceback on errors
+
+python -m gulfofmexico -s script.gomprint(x)!  // 10
+
+```
+
+reverse!This is added by me (the interpreter)! I wanted to share how this works.
+
+## Architecture
+
+print(x)!  // 5
+
+### Production Interpreter
+
+```Thanks to [this repo](https://github.com/marcizhu/marcizhu) for helpful reference for issues and actions in Python.
+
+All code execution flows through:
+
+- `gulfofmexico/__init__.py` - Entry point with `run_file()`
+
+- `gulfofmexico/interpreter.py` - Main execution engine (~2,900 lines)
+
+- Pattern matching on statement types for execution### Temporal Keywords**Local Storage (Primary):** Immutable constants are stored locally in your home directory under `~/.GulfOfMexico_runtime/.immutable_constants` and `~/.GulfOfMexico_runtime/.immutable_constants_values/`. This ensures they persist across sessions and work offline.
+
+
+
+### Experimental Components (Unused)
+
+
+
+The following exist but are NOT used in production:Access variable history:**Global Storage (Optional):** When possible, constants are also shared globally via GitHub Issues API:
+
+- `gulfofmexico/engine/` - Handler-based architecture proof-of-concept
+
+- `gulfofmexico/plugin_system.py` - Plugin system (not implemented)
+
+- Expression caching (not enabled)
+
+```gom- On the user's side, open a GitHub issue with a title of the format `Create Public Global: {name};;;{confidence}` and the body containing the pickled version of the value.
+
+## Language Specification
+
+var var x = 10!- Then, run a GitHub workflow that puts the issue body into a file under `global_objects/` and add an entry to `public_globals.txt` that contains the `name;;;id;;;confidence`
+
+Gulf of Mexico implements 92% of the original specification:
+
+x = 20!- Finally, to retrieve these values, the content of each of these files is fetched and converted back into values.
+
+**Implemented:**
+
+- ✅ -1 array indexingx = 30!
+
+- ✅ Fractional indexing
+
+- ✅ Probabilistic variablesprint(current(x))!   // 30If GitHub is unavailable (no internet, no API token), the constants still work perfectly - they're just stored locally only.
+
+- ✅ Temporal/line lifetimes
+
+- ✅ Three-valued booleansprint(previous(x))!  // 20
+
+- ✅ Flexible quoting
+
+- ✅ String interpolation```### Naming
+
+- ✅ next/previous tracking
+
+- ✅ when statements
+
+- ✅ async/await
+
+- ✅ Classes### OperatorsBoth variables and constants can be named with any Unicode character or string.
+
+- ✅ const const const globals
+
+- ✅ Import/export
+
+- ✅ Multiple equality levels
+
+- ✅ 40+ built-in functions**Arithmetic:** `+`, `-`, `*`, `/`, `^` (exponentiation)```javascript
+
+
+
+**Not Implemented:**const const firstAlphabetLetter = 'A'!
+
+- ❌ Reverse time operator
+
+- ❌ Some advanced plugin features**Comparison:** `>`, `<`, `>=`, `<=`, `==`, `!=`var const 👍 = True!
+
+- ❌ Distributed execution
+
+var var 1️⃣ = 1!
+
+## Examples
+
+**Logical:** `&` (AND), `|` (OR), `;` (NOT)```
+
+### Hello World
+
+
+
+```
+
+print("Hello, World!")!**Division by zero returns `undefined`:**This includes numbers, and other language constructs.
+
+```
+
+
+
+### Fibonacci
+
+```gom```javascript
+
+```
+
+function fib(n) => {const var result = 10 / 0!const const unchanging = const!
+
+   if n <= 0 {
+
+      return 0!print(result)!  // undefinedunchanging unchanging 5 = 4!
+
+   }
+
+   if n == 1 {```print(2 + 2 === 5)! //true
+
+      return 1!
+
+   }```
+
+   return fib(n - 1) + fib(n - 2)!
+
+}!### Delete Statement
+
+
+
+print(fib(10))!### Arrays
+
+```
+
+Delete values from memory:
+
+### Class Example
+
+Some languages start arrays at `0`, which can be unintuitive for beginners. Some languages start arrays at `1`, which isn't representative of how the code actually works. Gulf of Mexico does the best of both worlds: Arrays start at `-1`.
+
+```
+
+class Counter {```gom
+
+   var count 0!
+
+   delete 3!```javascript
+
+   function increment() => {
+
+      count = count + 1!delete "hello"!const const scores = [3, 2, 5]!
+
+      return count!
+
+   }!delete true!print(scores[-1])! //3
+
+}!
+
+```print(scores[0])!  //2
+
+const c new Counter()!
+
+print(c.increment())!  // 1print(scores[1])!  //5
+
+print(c.increment())!  // 2
+
+```### Indentation```
+
+
+
+### Reactive Programming
+
+
+
+```**All indentation must be multiples of 3 spaces:****New for 2022!**<br>
+
+var stock_price 100!
+
+You can now use floats for indexes too!
+
+when stock_price > 150 {
+
+   print("Stock is high!")!```gom
+
+}
+
+function example() => {```javascript
+
+when stock_price < 50 {
+
+   print("Stock is low!")!   const var x = 5!const var scores = [3, 2, 5]!
+
+}
+
+   if (x > 0) {scores[0.5] = 4!
+
+stock_price = 160!  // Triggers "Stock is high!"
+
+stock_price = 45!   // Triggers "Stock is low!"      print("Positive")!print(scores)! //[3, 2, 4, 5]
+
+```
+
+   }!```
+
+## License
+
+}!
+
+See LICENSE file for details.
+
 ```### When
 
+## Contributing
 
+
+
+This is an esoteric language project. Contributions welcome but expect unusual design decisions!
 
 Tabs count as 2 spaces (intentionally awkward).In case you really need to vary a variable, the `when` keyword lets you check a variable each time it mutates.
 
+## Author
 
+
+
+James HoneyBadger
 
 ## Running Programs```javascript
 
