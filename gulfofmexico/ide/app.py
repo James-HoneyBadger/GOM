@@ -80,9 +80,7 @@ if PYSIDE_AVAILABLE:
             self.console = QTextEdit()
             self.console.setReadOnly(True)
             self.console.setContextMenuPolicy(Qt.CustomContextMenu)
-            self.console.customContextMenuRequested.connect(
-                self._show_console_menu
-            )
+            self.console.customContextMenuRequested.connect(self._show_console_menu)
             dock = QDockWidget("Console", self)
             dock.setWidget(self.console)
             self.addDockWidget(Qt.BottomDockWidgetArea, dock)
@@ -118,13 +116,9 @@ if PYSIDE_AVAILABLE:
             self.statusBar().showMessage("Ready")
             self.recent_files: list[str] = []
             self._open_recent_menu = None
-            self._recent_path = (
-                Path.home() / ".config" / "gom-ide" / "recent.json"
-            )
+            self._recent_path = Path.home() / ".config" / "gom-ide" / "recent.json"
             self._load_recent_from_disk()
-            self._settings_path = (
-                Path.home() / ".config" / "gom-ide" / "settings.json"
-            )
+            self._settings_path = Path.home() / ".config" / "gom-ide" / "settings.json"
             self._loaded_settings: dict[str, object] | None = None
 
             # Menus
